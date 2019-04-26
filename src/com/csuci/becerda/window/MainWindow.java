@@ -1,0 +1,312 @@
+package com.csuci.becerda.window;
+
+import java.util.ArrayList;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
+
+import com.csuci.becerda.process.DiskPartProcess;
+import com.csuci.becerda.volume.Volume;
+import com.csuci.becerda.window.element.BitLockButton;
+import com.csuci.becerda.window.element.EjectButton;
+import com.csuci.becerda.window.element.FormatButton;
+import com.csuci.becerda.window.element.ROAttribButton;
+import com.csuci.becerda.window.element.RefreshButton;
+import com.csuci.becerda.window.element.RenameButton;
+
+public class MainWindow extends JFrame {
+
+	// Main Window Vars
+	private final int MAIN_WINDOW_HEIGHT = 250;
+	private final int MAIN_WINDOW_WIDTH = 450;
+	private final String MAIN_WINDOW_TITLE = "Diskpart GUI";
+
+	private final int MAIN_WINDOW_LARGE_PADDING = 15;
+	private final int MAIN_WINDOW_SMALL_PADDING = 5;
+	private final int MAIN_WINDOW_DEFAULT_BUTTON_H = 20;
+	private final int MAIN_WINDOW_DEFAULT_BUTTON_W = 90;
+
+	private final int MAIN_WINDOW_DEFAULT_X = 10;
+	private final int MAIN_WINDOW_DEFAULT_Y = 10;
+	private final int MAIN_WINDOW_DEFAULT_LABEL_W = 100;
+	private final int MAIN_WINDOW_DEFAULT_LABEL_H = 20;
+
+	// Main Window Status Vars
+	private final String MAIN_WINDOW_STATUS_FINDING_VOLS = "Finding Volumes...";
+	private final String MAIN_WINDOW_STATUS_FINDING_ATTRS = " Finding Attributes...";
+	private final String MAIN_WINDOW_STATUS_REFRESHING = "Refreshing...";
+	private final String MAIN_WINDOW_STATUS_SEP = " - ";
+	private final String MAIN_WINDOW_STATUS_FAILED_FIND_VOLS = "Failed To Find Volumes";
+	private final String MAIN_WINDOW_STATUS_FOUND_1 = "Finished, Found ";
+	private final String MAIN_WINDOW_STATUS_FOUND_2 = " Volume";
+	private final String MAIN_WINDOW_STATUS_FOUND_2S = " Volumes";
+	private final String MAIN_WINDOW_STATUS_SELECTED_VOL = "Selected Volume ";
+	private final String MAIN_WINDOW_STATUS_SELECTED_NONE = "No Volume Selected";
+	private final String MAIN_WINDOW_STATUS_FOUND_ATTRS = "Found Attributes";
+	private final String MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
+
+	// Volume Label Vars
+	private final String MAIN_WINDOW_VOL_LABEL = "Volume: ";
+	private final int MAIN_WINDOW_VOL_LAB_X = MAIN_WINDOW_DEFAULT_X;
+	private final int MAIN_WINDOW_VOL_LAB_Y = MAIN_WINDOW_DEFAULT_Y;
+	private final int MAIN_WINDOW_VOL_LAB_W = MAIN_WINDOW_DEFAULT_LABEL_W;
+	private final int MAIN_WINDOW_VOL_LAB_H = MAIN_WINDOW_DEFAULT_LABEL_H;
+
+	// Volume Table Vars
+	private final int MAIN_WINDOW_CB_X = MAIN_WINDOW_VOL_LAB_X;
+	private final int MAIN_WINDOW_CB_Y = MAIN_WINDOW_VOL_LAB_Y + MAIN_WINDOW_VOL_LAB_H + MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_CB_W = MAIN_WINDOW_WIDTH - MAIN_WINDOW_LARGE_PADDING - MAIN_WINDOW_DEFAULT_X;
+	private final int MAIN_WINDOW_CB_H = 20 * 5;
+	private final String[] VOL_TABLE_COL_NAMES = { "Number", "Letter", "Name", "Size", "Read-Only" };
+
+	// Refresh Button Vars
+	private final int MAIN_WINDOW_REFRESH_BUTTON_X = MAIN_WINDOW_WIDTH - MAIN_WINDOW_DEFAULT_BUTTON_W
+			- MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_REFRESH_BUTTON_Y = MAIN_WINDOW_VOL_LAB_Y;
+
+	// Eject Button Vars
+	private final int MAIN_WINDOW_EJECT_BUTTON_X = MAIN_WINDOW_VOL_LAB_X;
+	private final int MAIN_WINDOW_EJECT_BUTTON_Y = MAIN_WINDOW_CB_Y + MAIN_WINDOW_CB_H + MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_EJECT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+	private final int MAIN_WINDOW_EJECT_BUTTON_H = MAIN_WINDOW_DEFAULT_BUTTON_H;
+
+	// Format Button Vars
+	private final int MAIN_WINDOW_FORMAT_BUTTON_X = MAIN_WINDOW_EJECT_BUTTON_X + MAIN_WINDOW_EJECT_BUTTON_W
+			+ MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_FORMAT_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
+	private final int MAIN_WINDOW_FORMAT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+
+	// Rename Button Vars
+	private final int MAIN_WINDOW_RENAME_BUTTON_X = MAIN_WINDOW_FORMAT_BUTTON_X + MAIN_WINDOW_FORMAT_BUTTON_W
+			+ MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_RENAME_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
+	private final int MAIN_WINDOW_RENAME_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+
+	// Bitlocker Button Vars
+	private final int MAIN_WINDOW_BL_BUTTON_X = MAIN_WINDOW_RENAME_BUTTON_X + MAIN_WINDOW_RENAME_BUTTON_W
+			+ MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_BL_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
+
+	// ReadOnly Button Vars
+	private final int MAIN_WINDOW_READONLY_BUTTON_X = MAIN_WINDOW_EJECT_BUTTON_X;
+	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y + MAIN_WINDOW_EJECT_BUTTON_H
+			+ MAIN_WINDOW_SMALL_PADDING;
+
+	private JTable volT;
+	private JButton cattr;
+
+	private Volume selVol = null;
+
+	private ArrayList<Boolean> attribs;
+	private ArrayList<Volume> vols;
+
+	public MainWindow() {
+		super();
+
+		setSize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
+		setLayout(null);
+		setVisible(true);
+		setTitle(MAIN_WINDOW_TITLE);
+		setLocationRelativeTo(null);
+		setResizable(false);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		addComponents();
+
+		revalidate();
+		repaint();
+
+		refresh();
+	}
+
+	private void addComponents() {
+		addVolumeLabel();
+		addVolumeTable();
+		addRefreshButton();
+		addEjectButton();
+		addFormatButton();
+		addRenameButton();
+		addBitLockButton();
+		addReadOnlyButton();
+	}
+
+	private void addVolumeLabel() {
+		addLabel(MAIN_WINDOW_VOL_LABEL, MAIN_WINDOW_VOL_LAB_X, MAIN_WINDOW_VOL_LAB_Y, MAIN_WINDOW_VOL_LAB_W,
+				MAIN_WINDOW_VOL_LAB_H);
+	}
+
+	private void addVolumeTable() {
+		volT = new JTable(new String[10][10], VOL_TABLE_COL_NAMES);
+		for (int i = 0; i < volT.getColumnCount(); i++) {
+			Class<?> col_class = volT.getColumnClass(i);
+			volT.setDefaultEditor(col_class, null); // remove editor
+		}
+		JScrollPane sp = new JScrollPane(volT);
+		sp.setBounds(MAIN_WINDOW_CB_X, MAIN_WINDOW_CB_Y, MAIN_WINDOW_CB_W, MAIN_WINDOW_CB_H);
+		volT.setFillsViewportHeight(true);
+		volT.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (vols != null) {
+					int idx = volT.getSelectedRow();
+					if (idx < vols.size()) {
+						selVol = vols.get(idx);
+						if (attribs.get(idx)) {
+							cattr.setText(ROAttribButton.READONLY_BUTTON_CLEAR);
+						} else {
+							cattr.setText(ROAttribButton.READONLY_BUTTON_SET);
+						}
+						updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
+					}
+				}
+			}
+		});
+		volT.getTableHeader().setResizingAllowed(false);
+		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
+		renderer.setHorizontalAlignment(JLabel.CENTER);
+		for (int i = 0; i < volT.getColumnCount(); i++) {
+			volT.getColumnModel().getColumn(i).setCellRenderer(renderer);
+		}
+		getContentPane().add(sp);
+	}
+
+	private void addRefreshButton() {
+		new RefreshButton(this, MAIN_WINDOW_REFRESH_BUTTON_X, MAIN_WINDOW_REFRESH_BUTTON_Y);
+	}
+
+	private void addEjectButton() {
+		new EjectButton(this, MAIN_WINDOW_EJECT_BUTTON_X, MAIN_WINDOW_EJECT_BUTTON_Y);
+	}
+
+	private void addFormatButton() {
+		new FormatButton(this, MAIN_WINDOW_FORMAT_BUTTON_X, MAIN_WINDOW_FORMAT_BUTTON_Y);
+	}
+
+	private void addRenameButton() {
+		new RenameButton(this, MAIN_WINDOW_RENAME_BUTTON_X, MAIN_WINDOW_RENAME_BUTTON_Y);
+	}
+
+	private void addBitLockButton() {
+		new BitLockButton(this, MAIN_WINDOW_BL_BUTTON_X, MAIN_WINDOW_BL_BUTTON_Y);
+	}
+
+	private void addReadOnlyButton() {
+		cattr = new ROAttribButton(this, MAIN_WINDOW_READONLY_BUTTON_X, MAIN_WINDOW_READONLY_BUTTON_Y);
+	}
+
+	public Volume getSelectedVolume() {
+		return selVol;
+	}
+
+	private void clearVolumeTable() {
+		for (int i = 0; i < volT.getRowCount() - 1; i++) {
+			for (int j = 0; j < volT.getColumnCount(); j++) {
+				volT.setValueAt("", i, j);
+			}
+		}
+	}
+
+	private void updateVolumeTableBox() {
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				clearVolumeTable();
+				for (int i = 0; i < vols.size(); i++) {
+					volT.setValueAt(vols.get(i).getNumber() + "", i, 0);
+					volT.setValueAt(vols.get(i).getLetterColon() + "", i, 1);
+					volT.setValueAt(vols.get(i).getLabel(), i, 2);
+					volT.setValueAt(vols.get(i).getSize() + " " + vols.get(i).getGK() + "B", i, 3);
+				}
+				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + vols.size()
+						+ (vols.size() > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
+								: (vols.size() == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
+			}
+		});
+	}
+
+	public void refresh() {
+		updateStatus(MAIN_WINDOW_STATUS_REFRESHING);
+		getVolumes();
+	}
+
+	private void getVolumes() {
+		Thread dp = new Thread() {
+			@Override
+			public void run() {
+				updateStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
+				vols = new DiskPartProcess().getVolumes();
+				if (vols != null) {
+					updateVolumeTableBox();
+					getAttributes();
+					cattr.setEnabled(true);
+				} else
+					updateStatus(MAIN_WINDOW_STATUS_FAILED_FIND_VOLS);
+			}
+		};
+		dp.start();
+	}
+
+	private void getAttributes() {
+		cattr.setEnabled(false);
+		attribs = new DiskPartProcess().getAttributes(vols);
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				if (attribs.size() > 0) {
+					for (int i = 0; i < attribs.size(); i++) {
+						volT.getModel().setValueAt(attribs.get(i) ? "Yes" : "No", i, 4);
+					}
+				} else {
+					updateStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
+				}
+			}
+		});
+	}
+
+	public boolean getRO() {
+		return attribs.get(selVol.getNumber());
+	}
+
+	public boolean isValidVolume() {
+		if (selVol == null) {
+			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			return false;
+		}
+		if (selVol.getNumber() == -1) {
+			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			return false;
+		}
+		if (!selVol.getType().equals("Removable")) {
+			updateStatus("Volume " + selVol.getLetterColon() + " Is Not Removable");
+			return false;
+		}
+		return true;
+	}
+
+	private JLabel addLabel(String label, int x, int y, int w, int h) {
+		JLabel l = new JLabel(label);
+		l.setBounds(x, y, w, h);
+		l.setVisible(true);
+		getContentPane().add(l);
+		return l;
+	}
+
+	public void updateStatus(String status) {
+		SwingUtilities.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				setTitle(MAIN_WINDOW_TITLE + MAIN_WINDOW_STATUS_SEP + status);
+			}
+		});
+	}
+
+}

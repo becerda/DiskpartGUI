@@ -1,0 +1,86 @@
+package com.csuci.becerda.window.element;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
+import com.csuci.becerda.process.DiskPartProcess;
+import com.csuci.becerda.volume.Volume;
+import com.csuci.becerda.window.MainWindow;
+
+public class ROAttribButton extends JButton {
+
+	private final int WIDTH = 140;
+	private final int HEIGHT = 20;
+
+	public static final String READONLY_BUTTON_SET = "Set Read-Only";
+	public static final String READONLY_BUTTON_CLEAR = "Clear Read-Only";
+
+	private MainWindow mw;
+
+	public ROAttribButton(MainWindow mw, int x, int y) {
+		super("Set Read-Only");
+		setBounds(x, y, WIDTH, HEIGHT);
+		setVisible(true);
+		setEnabled(false);
+		this.mw = mw;
+		mw.getContentPane().add(this);
+		addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (mw.isValidVolume()) {
+					setEnabled(false);
+					if (mw.getRO())
+						setReadOnly(false);
+					else
+						setReadOnly(true);
+
+				}
+
+			}
+		});
+	}
+
+	private void setReadOnly(boolean set) {
+		Thread ro = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Volume v = mw.getSelectedVolume();
+				String sc = "";
+				if (set)
+					sc = "Set";
+				else
+					sc = "Clear";
+
+				int ans = JOptionPane.showConfirmDialog(mw,
+						"Do You Want To " + sc + " The Read-Only Flag On Volume " + v.getLetterColon() + "?",
+						sc + " Read-Only" + v.getLetterColon(), JOptionPane.YES_NO_OPTION);
+				if (ans == JOptionPane.YES_OPTION) {
+					int code;
+					if (set)
+						code = new DiskPartProcess().setReadOnly(v) ? DiskPartProcess.PROCESS_EXIT_CODE_OK
+								: DiskPartProcess.PROCESS_EXIT_CODE_ERR;
+					else
+						code = new DiskPartProcess().clearReadOnly(v) ? DiskPartProcess.PROCESS_EXIT_CODE_OK
+								: DiskPartProcess.PROCESS_EXIT_CODE_ERR;
+
+					if (code == DiskPartProcess.PROCESS_EXIT_CODE_OK) {
+						JOptionPane.showMessageDialog(mw,
+								"Successfully " + (set ? sc : sc + "ed") + " Read-Only Flag On Volume "
+										+ v.getLetterColon(),
+								sc + " Read-Only " + v.getLetterColon(), JOptionPane.INFORMATION_MESSAGE);
+						mw.updateStatus(v.getLetterColon() + " Read-Only Set");
+						mw.refresh();
+					} else
+						JOptionPane.showMessageDialog(mw,
+								"Failed To " + sc + " Read-Only Flag On Volume " + v.getLetterColon(),
+								sc + " Read-Only " + v.getLetterColon(), JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		ro.start();
+	}
+}
