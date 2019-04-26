@@ -140,5 +140,5 @@ control /name Microsoft.BitLockerDriveEncryption
 ### Returns
 Nothing is returned
 
-###Displayed Info On GUI
+### Displayed Info On GUI
 Button below displayed drive with “BitLocker” on it.
