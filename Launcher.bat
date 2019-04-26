@@ -1,0 +1,1 @@
+java.exe -jar "%~dp0\DiskPartGUI.jar"
