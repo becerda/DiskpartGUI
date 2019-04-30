@@ -145,7 +145,7 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	private ArrayList<Volume> parseVolumes(String input) {
-		String regex = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z])( ){3}(?<vollab>[a-zA-Z ]{0,10})( ){3}(?<volfs>NTFS|FAT32|exFAT)( ){2,4}(?<voltype>Partition|Removable)( ){4,5}(?<volsize>[1-9]{1,3})( )(?<volgk>K|G)B( ){2}(?<volstat>Healthy)( ){0,4}(?<volinfo>[a-zA-Z]+)?";
+		String regex = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z])( ){3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT)( ){2,4}(?<voltype>Partition|Removable)( ){4,5}(?<volsize>[1-9]{1,3})( )(?<volgk>K|G)B( ){2}(?<volstat>Healthy)( ){0,4}(?<volinfo>[a-zA-Z]+)?";
 		Pattern p = Pattern.compile(regex);
 		Matcher m = p.matcher(input);
 		ArrayList<Volume> vols = new ArrayList<Volume>();
