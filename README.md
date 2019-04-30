@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-
 # DiskpartGUI
 GUI for Windows Diskpart
 
@@ -143,6 +141,3 @@ Nothing is returned
 
 ### Displayed Info On GUI
 Button below displayed drive with “BitLocker” on it.
-=======
-# thumbdrivegui
->>>>>>> 8fb485f054c40ad4315b7f4ac073425a2ae07be1
