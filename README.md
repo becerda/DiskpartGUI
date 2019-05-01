@@ -29,8 +29,8 @@ Diskpart command line interpreter by Java will be used to display information.
 ```bash
 LIST VOLUME
 ```
-LIST - Command to list all disks, partitions, volume, or virtual disks
-VOLUME - Command used in conjunction with List to display all volumes
+	LIST - Command to list all disks, partitions, volume, or virtual disks
+	VOLUME - Command used in conjunction with List to display all volumes
 
 ### Returns
 	Volume Number
@@ -67,6 +67,9 @@ ATTRIBUTES DISK [SET | CLEAR] [READONLY] [NOERR]
 ### Returns
 Successful or error message
 
+### Displayed Info On GUI
+A pop-up window will appear upon completion showing either successful or error.
+
 #### Command 2:
 ```bash
 ATTRIBUTES DISK
@@ -78,7 +81,7 @@ ATTRIBUTES DISK
 Attribute for selected disk.
 
 ### Displayed Info On GUI
-A column in the previously mentioned JTable marked as "Yes" or "No"
+A column in the previously mentioned JTable marked as "Yes" or "No".
 
 ## Safely Eject Drives
 Diskpart command executed through Java, the selected drive will be unmounted and safe to remove.
