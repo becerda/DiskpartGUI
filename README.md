@@ -71,18 +71,17 @@ Attribute for selected disk.
 A column in the previously mentioned JTable marked as "Yes" or "No"
 
 ## Safely Eject Drives
-PowerShell command executed through Java, the selected drive will be ejected.
+Diskpart command executed through Java, the selected drive will be unmounted and safe to remove.
 ### PowerShell
 ```bash
-(New-Object -comObject Shell.Application).Namespace(17).ParseName(“<VolumeLetter>:”).InvokeVerb(“Eject”)
+remove all dismount
 ```
-	(New-Object -comObject Shell.Application) - Creates a new shell object
-	Namespace(17) - Gets drives
-	ParseName(“<VolumeLetter>:”) - Selects the volume with given letter
-	InvokeVerb(“Eject”) - Ejects selected volume
+	remove - command used to unmount a drive
+	all - tells diskpart to unmount all mounting points
+	dismount - tells diskpart to dismount the selected volume
 
 ### Returns
-PowerShell does not return anything.
+Diskpart returns a success or error message
 
 ### Displayed Info On GUI
 Button below displayed drive with “Eject” on it.
@@ -90,6 +89,7 @@ Will show popup notification of either safely ejected or error.
 
 ## Format Removable Drives
 Diskpart command line interpreter by Java will be used to format removable drives.
+
 ### Diskpart
 ```bash
 format [fs=<fs>] [label=<label>] [unit=<n>] [quick]
@@ -109,6 +109,7 @@ A pop up window will appear upon completion showing either successful or error.
 
 ## Rename Volume
 Label command line interpreter by Java will be used to rename removable drives.
+
 ### Label
 ```bash
 label [drive:\] [label]
