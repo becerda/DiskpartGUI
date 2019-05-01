@@ -1,7 +1,17 @@
 # DiskpartGUI
 GUI for Windows Diskpart
 
-## Diskpart Write-Up
+## Installation
+There are a few things required to run this application:
+	1) DikspartGUI.jar
+	2) Launcher.bat
+	3) Java 8.0 or later
+	4) Diskpart Gui Shortcut (Not required but helps run the launcher)
+
+## How To Run
+Run through shortcut link or launcher.bat. This program requires administrative rights and will not work if launched directly through the jar file.
+
+## Write-Up
 This readme will go over the commands used to preform the background tasks of various processes.
 
 ## Requirements
