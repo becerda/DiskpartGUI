@@ -116,8 +116,8 @@ public class DiskPartProcess extends ProcessRunner {
 
 	public ArrayList<Boolean> getAttributes(ArrayList<Volume> vols) {
 		for (Volume v : vols) {
-			addToScript("select disk " + v.getNumber());
-			addToScript("attribute disk");
+			addToScript("SELECT DISK " + v.getNumber());
+			addToScript("ATTRIBUTE DISK");
 		}
 		writeScript();
 		String output = run();
@@ -137,7 +137,7 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	public ArrayList<Volume> getVolumes() {
-		addToScript("list volume");
+		addToScript("LIST VOLUME");
 		writeScript();
 		String output = run();
 		script.delete();

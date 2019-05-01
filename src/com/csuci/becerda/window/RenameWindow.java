@@ -35,7 +35,7 @@ public class RenameWindow extends JFrame{
 		setLayout(null);
 		setResizable(false);
 		setLocationRelativeTo(null);
-		setTitle("Rename");
+		setTitle(" ");
 		setVisible(true);
 		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -94,7 +94,7 @@ public class RenameWindow extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 
 				int resp = JOptionPane.showConfirmDialog(RenameWindow.this,
-						"Are you sure you want to rename " + v.getLetterColon() + "?", "Confirm Rename",
+						"Are You Sure You Want To Rename " + v.getLetterColon() + "?", "Confirm Rename",
 						JOptionPane.YES_NO_OPTION);
 
 				if (resp == JOptionPane.OK_OPTION) {

@@ -181,7 +181,7 @@ public class MainWindow extends JFrame {
 				updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
 				umount.setText(UMountButton.EJECT);
 			} else {
-				updateStatus("Volume is not mounted");
+				updateStatus("Volume Is Not Mounted");
 				umount.setText(UMountButton.MOUNT);
 			}
 		}
