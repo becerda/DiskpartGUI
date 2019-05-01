@@ -1,8 +1,5 @@
 @echo off
-:: BatchGotAdmin (Run as Admin code starts)
-REM --> Check for permissions
 >nul 2>&1 "%SYSTEMROOT%\system32\cacls.exe" "%SYSTEMROOT%\system32\config\system"
-REM --> If error flag set, we do not have admin.
 if '%errorlevel%' NEQ '0' (
 goto UACPrompt
 ) else ( goto gotAdmin )
@@ -15,6 +12,5 @@ exit /B
 if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
 pushd "%CD%"
 CD /D "%~dp0"
-:: BatchGotAdmin (Run as Admin code ends)
 start /min java.exe -jar "%~dp0\DiskPartGUI.jar"
 exit
