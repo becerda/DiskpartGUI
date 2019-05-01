@@ -10,7 +10,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -20,6 +19,7 @@ import com.csuci.becerda.process.DiskPartProcess;
 import com.csuci.becerda.process.FormatOptions;
 import com.csuci.becerda.volume.Volume;
 
+@SuppressWarnings("serial")
 public class FormatWindow extends JFrame {
 
 	private final int width = 250;
@@ -42,7 +42,6 @@ public class FormatWindow extends JFrame {
 
 		setSize(width, height);
 		setLayout(null);
-		setVisible(true);
 		setTitle("Format");
 		setLocationRelativeTo(null);
 		setResizable(false);
@@ -50,7 +49,8 @@ public class FormatWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		addComponents();
-
+		setVisible(true);
+		
 		revalidate();
 		repaint();
 	}
@@ -76,7 +76,6 @@ public class FormatWindow extends JFrame {
 		if (v.getLabel().trim().length() > 0)
 			label.setText(v.getLabel().trim());
 		label.setBounds(5 + 75, 10, 100, 20);
-		label.setVisible(true);
 		label.addKeyListener(new KeyListener() {
 
 			@Override
@@ -98,6 +97,7 @@ public class FormatWindow extends JFrame {
 			}
 		});
 		getContentPane().add(label);
+		label.setVisible(true);
 	}
 
 	private void addFSLabel() {
@@ -107,7 +107,7 @@ public class FormatWindow extends JFrame {
 	private void addFSComboBox() {
 		JComboBox<String> fs = new JComboBox<String>(FormatOptions.fs);
 		fs.setBounds(5 + 75, 10 + 20 + 5, 100, 20);
-		fs.setVisible(true);
+		fs.setEditable(false);
 		fs.addActionListener(new ActionListener() {
 
 			@Override
@@ -129,6 +129,7 @@ public class FormatWindow extends JFrame {
 			}
 		});
 		getContentPane().add(fs);
+		fs.setVisible(true);
 	}
 
 	private void addUnitLabel() {
@@ -138,7 +139,6 @@ public class FormatWindow extends JFrame {
 	private void addUnitComboBox() {
 		JComboBox<String> unit = new JComboBox<String>(FormatOptions.unitsize);
 		unit.setBounds(5 + 75, 10 + 40 + 10, 100, 20);
-		unit.setVisible(true);
 		unit.addActionListener(new ActionListener() {
 
 			@Override
@@ -199,9 +199,11 @@ public class FormatWindow extends JFrame {
 					fo.setUnitSize32768K();
 					break;
 				}
+				
 			}
 		});
 		getContentPane().add(unit);
+		unit.setVisible(true);
 	}
 
 	private void addQuckCheckBox() {
@@ -230,7 +232,7 @@ public class FormatWindow extends JFrame {
 				fo.setLabel(label.getText());
 
 				int resp = JOptionPane.showConfirmDialog(FormatWindow.this,
-						"Are you sure you want to format " + v.getLetterColon() + "?", "Confirm Format",
+						"Are You Sure You Want To Format " + v.getLetterColon() + "?", "Confirm Format",
 						JOptionPane.YES_NO_OPTION);
 
 				if (resp == JOptionPane.OK_OPTION) {
@@ -247,7 +249,7 @@ public class FormatWindow extends JFrame {
 								mw.refresh();
 								dispose();
 							} else {
-								JOptionPane.showMessageDialog(FormatWindow.this, "Error with format", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(FormatWindow.this, "Error With Format", "Error", JOptionPane.ERROR_MESSAGE);
 								apply.setEnabled(true);
 								cancel.setEnabled(true);
 								FormatWindow.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

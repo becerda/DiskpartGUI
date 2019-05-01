@@ -10,6 +10,7 @@ import com.csuci.becerda.process.DiskPartProcess;
 import com.csuci.becerda.volume.Volume;
 import com.csuci.becerda.window.MainWindow;
 
+@SuppressWarnings("serial")
 public class ROAttribButton extends JButton {
 
 	private final int WIDTH = 140;
@@ -74,10 +75,16 @@ public class ROAttribButton extends JButton {
 								sc + " Read-Only " + v.getLetterColon(), JOptionPane.INFORMATION_MESSAGE);
 						mw.updateStatus(v.getLetterColon() + " Read-Only Set");
 						mw.refresh();
+						if(set)
+							setText(READONLY_BUTTON_CLEAR);
+						else
+							setText(READONLY_BUTTON_SET);
 					} else
 						JOptionPane.showMessageDialog(mw,
 								"Failed To " + sc + " Read-Only Flag On Volume " + v.getLetterColon(),
 								sc + " Read-Only " + v.getLetterColon(), JOptionPane.ERROR_MESSAGE);
+				} else {
+					setEnabled(true);
 				}
 			}
 		});

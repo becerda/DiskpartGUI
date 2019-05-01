@@ -7,6 +7,7 @@ import javax.swing.JButton;
 
 import com.csuci.becerda.window.MainWindow;
 
+@SuppressWarnings("serial")
 public class RefreshButton extends JButton{
 	
 	private final int WIDTH = 80;

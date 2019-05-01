@@ -6,7 +6,7 @@ public class PowerShellProcess extends ProcessRunner {
 
 	public PowerShellProcess() {
 		super();
-		setProcess("powershell.exe");
+		setProcess("powershell");
 		addArg("-Command");
 	}
 

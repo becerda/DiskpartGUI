@@ -15,12 +15,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 import com.csuci.becerda.process.DiskPartProcess;
 import com.csuci.becerda.volume.Volume;
 import com.csuci.becerda.window.element.BitLockButton;
-import com.csuci.becerda.window.element.EjectButton;
 import com.csuci.becerda.window.element.FormatButton;
 import com.csuci.becerda.window.element.ROAttribButton;
 import com.csuci.becerda.window.element.RefreshButton;
 import com.csuci.becerda.window.element.RenameButton;
+import com.csuci.becerda.window.element.UMountButton;
 
+@SuppressWarnings("serial")
 public class MainWindow extends JFrame {
 
 	// Main Window Vars
@@ -40,7 +41,6 @@ public class MainWindow extends JFrame {
 
 	// Main Window Status Vars
 	private final String MAIN_WINDOW_STATUS_FINDING_VOLS = "Finding Volumes...";
-	private final String MAIN_WINDOW_STATUS_FINDING_ATTRS = " Finding Attributes...";
 	private final String MAIN_WINDOW_STATUS_REFRESHING = "Refreshing...";
 	private final String MAIN_WINDOW_STATUS_SEP = " - ";
 	private final String MAIN_WINDOW_STATUS_FAILED_FIND_VOLS = "Failed To Find Volumes";
@@ -49,7 +49,6 @@ public class MainWindow extends JFrame {
 	private final String MAIN_WINDOW_STATUS_FOUND_2S = " Volumes";
 	private final String MAIN_WINDOW_STATUS_SELECTED_VOL = "Selected Volume ";
 	private final String MAIN_WINDOW_STATUS_SELECTED_NONE = "No Volume Selected";
-	private final String MAIN_WINDOW_STATUS_FOUND_ATTRS = "Found Attributes";
 	private final String MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
 
 	// Volume Label Vars
@@ -71,7 +70,7 @@ public class MainWindow extends JFrame {
 			- MAIN_WINDOW_SMALL_PADDING;
 	private final int MAIN_WINDOW_REFRESH_BUTTON_Y = MAIN_WINDOW_VOL_LAB_Y;
 
-	// Eject Button Vars
+	// Eject/Mount Button Vars
 	private final int MAIN_WINDOW_EJECT_BUTTON_X = MAIN_WINDOW_VOL_LAB_X;
 	private final int MAIN_WINDOW_EJECT_BUTTON_Y = MAIN_WINDOW_CB_Y + MAIN_WINDOW_CB_H + MAIN_WINDOW_SMALL_PADDING;
 	private final int MAIN_WINDOW_EJECT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
@@ -99,8 +98,10 @@ public class MainWindow extends JFrame {
 	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y + MAIN_WINDOW_EJECT_BUTTON_H
 			+ MAIN_WINDOW_SMALL_PADDING;
 
+
 	private JTable volT;
 	private JButton cattr;
+	private JButton umount;
 
 	private Volume selVol = null;
 
@@ -159,12 +160,8 @@ public class MainWindow extends JFrame {
 					int idx = volT.getSelectedRow();
 					if (idx < vols.size()) {
 						selVol = vols.get(idx);
-						if (attribs.get(idx)) {
-							cattr.setText(ROAttribButton.READONLY_BUTTON_CLEAR);
-						} else {
-							cattr.setText(ROAttribButton.READONLY_BUTTON_SET);
-						}
-						updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
+						updateAttr();
+						updateUMount();
 					}
 				}
 			}
@@ -178,12 +175,34 @@ public class MainWindow extends JFrame {
 		getContentPane().add(sp);
 	}
 
+	private void updateUMount() {
+		if (selVol != null) {
+			if (selVol.isMounted()) {
+				updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
+				umount.setText(UMountButton.EJECT);
+			} else {
+				updateStatus("Volume is not mounted");
+				umount.setText(UMountButton.MOUNT);
+			}
+		}
+	}
+
+	private void updateAttr() {
+		if (cattr != null && selVol != null) {
+			if (attribs.get(selVol.getNumber())) {
+				cattr.setText(ROAttribButton.READONLY_BUTTON_CLEAR);
+			} else {
+				cattr.setText(ROAttribButton.READONLY_BUTTON_SET);
+			}
+		}
+	}
+
 	private void addRefreshButton() {
 		new RefreshButton(this, MAIN_WINDOW_REFRESH_BUTTON_X, MAIN_WINDOW_REFRESH_BUTTON_Y);
 	}
 
 	private void addEjectButton() {
-		new EjectButton(this, MAIN_WINDOW_EJECT_BUTTON_X, MAIN_WINDOW_EJECT_BUTTON_Y);
+		umount = new UMountButton(this, MAIN_WINDOW_EJECT_BUTTON_X, MAIN_WINDOW_EJECT_BUTTON_Y);
 	}
 
 	private void addFormatButton() {
@@ -219,14 +238,19 @@ public class MainWindow extends JFrame {
 			public void run() {
 				clearVolumeTable();
 				for (int i = 0; i < vols.size(); i++) {
+					Volume v = vols.get(i);
 					volT.setValueAt(vols.get(i).getNumber() + "", i, 0);
-					volT.setValueAt(vols.get(i).getLetterColon() + "", i, 1);
-					volT.setValueAt(vols.get(i).getLabel(), i, 2);
-					volT.setValueAt(vols.get(i).getSize() + " " + vols.get(i).getGK() + "B", i, 3);
+					if (v.isMounted()) {
+						volT.setValueAt(vols.get(i).getLetterColon() + "", i, 1);
+						volT.setValueAt(vols.get(i).getLabel(), i, 2);
+						volT.setValueAt(vols.get(i).getSize() + " " + vols.get(i).getGK() + "B", i, 3);
+					} else {
+						volT.setValueAt("UNMOUNTED", i, 1);
+					}
+
 				}
-				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + vols.size()
-						+ (vols.size() > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
-								: (vols.size() == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
+				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + vols.size() + (vols.size() > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
+						: (vols.size() == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
 			}
 		});
 	}
@@ -268,6 +292,7 @@ public class MainWindow extends JFrame {
 					updateStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
 				}
 			}
+			
 		});
 	}
 
@@ -280,6 +305,8 @@ public class MainWindow extends JFrame {
 			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
 			return false;
 		}
+		if (!selVol.isMounted())
+			return false;
 		if (selVol.getNumber() == -1) {
 			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
 			return false;

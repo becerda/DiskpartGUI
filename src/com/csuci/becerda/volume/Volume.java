@@ -104,5 +104,9 @@ public class Volume {
 	public void setInfo(String info) {
 		this.info = info;
 	}
+	
+	public boolean isMounted(){
+		return getLetter() != ' ';
+	}
 
 }

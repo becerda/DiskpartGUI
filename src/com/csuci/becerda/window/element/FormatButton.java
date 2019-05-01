@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import com.csuci.becerda.window.FormatWindow;
 import com.csuci.becerda.window.MainWindow;
 
+@SuppressWarnings("serial")
 public class FormatButton extends JButton{
 
 	private final int width = 90;

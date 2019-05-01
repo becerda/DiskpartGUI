@@ -8,6 +8,7 @@ import javax.swing.JButton;
 import com.csuci.becerda.process.ProcessRunner;
 import com.csuci.becerda.window.MainWindow;
 
+@SuppressWarnings("serial")
 public class BitLockButton extends JButton{
 
 	private int width = 90;

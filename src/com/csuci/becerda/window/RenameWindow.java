@@ -14,6 +14,7 @@ import javax.swing.JTextField;
 import com.csuci.becerda.process.LabelProcess;
 import com.csuci.becerda.volume.Volume;
 
+@SuppressWarnings("serial")
 public class RenameWindow extends JFrame{
 
 	private final int width = 180;
