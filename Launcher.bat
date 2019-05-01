@@ -16,6 +16,5 @@ if exist "%temp%\getadmin.vbs" ( del "%temp%\getadmin.vbs" )
 pushd "%CD%"
 CD /D "%~dp0"
 :: BatchGotAdmin (Run as Admin code ends)
-:: Your codes should start from the following line
 start /min java.exe -jar "%~dp0\DiskPartGUI.jar"
 exit
