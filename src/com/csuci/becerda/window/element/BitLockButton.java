@@ -9,26 +9,18 @@ import com.csuci.becerda.process.ProcessRunner;
 import com.csuci.becerda.window.MainWindow;
 
 @SuppressWarnings("serial")
-public class BitLockButton extends JButton{
+public class BitLockButton extends BaseButton{
 
-	private int width = 90;
-	private int height = 20;
-	
 	public BitLockButton(MainWindow mw, int x, int y){
-		super("BitLock");
-		setBounds(x, y, width, height);
-		setVisible(true);
-		addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				ProcessRunner p = new ProcessRunner();
-				p.setProcess("control");
-				p.addArg("/name");
-				p.addArg("Microsoft.BitLockerDriveEncryption");
-				p.run();
-			}
-		});
-		mw.getContentPane().add(this);
+		super(mw, "BitLock", x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		ProcessRunner p = new ProcessRunner();
+		p.setProcess("control");
+		p.addArg("/name");
+		p.addArg("Microsoft.BitLockerDriveEncryption");
+		p.run();	
 	}
 }

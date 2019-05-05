@@ -1,10 +1,19 @@
 package com.csuci.becerda.window;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -14,6 +23,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import com.csuci.becerda.process.DiskPartProcess;
 import com.csuci.becerda.volume.Volume;
+import com.csuci.becerda.window.element.BaseButton;
 import com.csuci.becerda.window.element.BitLockButton;
 import com.csuci.becerda.window.element.FormatButton;
 import com.csuci.becerda.window.element.ROAttribButton;
@@ -25,14 +35,14 @@ import com.csuci.becerda.window.element.UMountButton;
 public class MainWindow extends JFrame {
 
 	// Main Window Vars
-	private final int MAIN_WINDOW_HEIGHT = 250;
+	private final int MAIN_WINDOW_HEIGHT = 225;
 	private final int MAIN_WINDOW_WIDTH = 450;
 	private final String MAIN_WINDOW_TITLE = "Diskpart GUI";
 
 	private final int MAIN_WINDOW_LARGE_PADDING = 15;
 	private final int MAIN_WINDOW_SMALL_PADDING = 5;
 	private final int MAIN_WINDOW_DEFAULT_BUTTON_H = 20;
-	private final int MAIN_WINDOW_DEFAULT_BUTTON_W = 90;
+	private final int MAIN_WINDOW_DEFAULT_BUTTON_W = BaseButton.DEFAULT_WIDTH;
 
 	private final int MAIN_WINDOW_DEFAULT_X = 10;
 	private final int MAIN_WINDOW_DEFAULT_Y = 10;
@@ -67,14 +77,13 @@ public class MainWindow extends JFrame {
 
 	// Refresh Button Vars
 	private final int MAIN_WINDOW_REFRESH_BUTTON_X = MAIN_WINDOW_WIDTH - MAIN_WINDOW_DEFAULT_BUTTON_W
-			- MAIN_WINDOW_SMALL_PADDING;
+			- MAIN_WINDOW_LARGE_PADDING;
 	private final int MAIN_WINDOW_REFRESH_BUTTON_Y = MAIN_WINDOW_VOL_LAB_Y;
 
 	// Eject/Mount Button Vars
 	private final int MAIN_WINDOW_EJECT_BUTTON_X = MAIN_WINDOW_VOL_LAB_X;
 	private final int MAIN_WINDOW_EJECT_BUTTON_Y = MAIN_WINDOW_CB_Y + MAIN_WINDOW_CB_H + MAIN_WINDOW_SMALL_PADDING;
 	private final int MAIN_WINDOW_EJECT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
-	private final int MAIN_WINDOW_EJECT_BUTTON_H = MAIN_WINDOW_DEFAULT_BUTTON_H;
 
 	// Format Button Vars
 	private final int MAIN_WINDOW_FORMAT_BUTTON_X = MAIN_WINDOW_EJECT_BUTTON_X + MAIN_WINDOW_EJECT_BUTTON_W
@@ -94,10 +103,12 @@ public class MainWindow extends JFrame {
 	private final int MAIN_WINDOW_BL_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
 
 	// ReadOnly Button Vars
-	private final int MAIN_WINDOW_READONLY_BUTTON_X = MAIN_WINDOW_EJECT_BUTTON_X;
-	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y + MAIN_WINDOW_EJECT_BUTTON_H
-			+ MAIN_WINDOW_SMALL_PADDING;
-
+	private final int MAIN_WINDOW_READONLY_BUTTON_X = MAIN_WINDOW_BL_BUTTON_X + MAIN_WINDOW_DEFAULT_BUTTON_W
+			+ MAIN_WINDOW_SMALL_PADDING;// MAIN_WINDOW_EJECT_BUTTON_X;
+	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;// MAIN_WINDOW_EJECT_BUTTON_Y
+																					// +
+																					// MAIN_WINDOW_EJECT_BUTTON_H
+	// + MAIN_WINDOW_SMALL_PADDING;
 
 	private JTable volT;
 	private JButton cattr;
@@ -107,6 +118,9 @@ public class MainWindow extends JFrame {
 
 	private ArrayList<Boolean> attribs;
 	private ArrayList<Volume> vols;
+	private ArrayList<Volume> shownVols;
+
+	private boolean showHD = true;
 
 	public MainWindow() {
 		super();
@@ -128,6 +142,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private void addComponents() {
+		addMenuBar();
 		addVolumeLabel();
 		addVolumeTable();
 		addRefreshButton();
@@ -136,6 +151,66 @@ public class MainWindow extends JFrame {
 		addRenameButton();
 		addBitLockButton();
 		addReadOnlyButton();
+	}
+
+	private void addMenuBar() {
+		JMenuBar menu = new JMenuBar();
+
+		JMenu file = new JMenu("File");
+		file.setMnemonic(KeyEvent.VK_F);
+
+		JMenuItem exit = new JMenuItem("Exit");
+		exit.setMnemonic(KeyEvent.VK_E);
+		exit.setToolTipText("Exits Application");
+		exit.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
+
+		JMenu view = new JMenu("View");
+		view.setMnemonic(KeyEvent.VK_O);
+
+		JCheckBoxMenuItem showHardDrives = new JCheckBoxMenuItem("Show Hard Drives");
+		showHardDrives.setMnemonic(KeyEvent.VK_H);
+		showHardDrives.setSelected(true);
+		showHardDrives.addItemListener(new ItemListener() {
+
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					showHD = true;
+				} else {
+					showHD = false;
+				}
+				refresh();
+			}
+		});
+
+		JMenu help = new JMenu("Help");
+		help.setMnemonic(KeyEvent.VK_H);
+
+		JMenuItem about = new JMenuItem("About");
+		about.setMnemonic(KeyEvent.VK_A);
+		about.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+			}
+		});
+
+		file.add(exit);
+		view.add(showHardDrives);
+		help.add(about);
+
+		menu.add(file);
+		menu.add(view);
+		menu.add(help);
+
+		setJMenuBar(menu);
 	}
 
 	private void addVolumeLabel() {
@@ -156,10 +231,10 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
-				if (vols != null) {
+				if (shownVols != null) {
 					int idx = volT.getSelectedRow();
-					if (idx < vols.size()) {
-						selVol = vols.get(idx);
+					if (idx < shownVols.size()) {
+						selVol = shownVols.get(idx);
 						updateAttr();
 						updateUMount();
 					}
@@ -237,20 +312,20 @@ public class MainWindow extends JFrame {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				clearVolumeTable();
-				for (int i = 0; i < vols.size(); i++) {
-					Volume v = vols.get(i);
-					volT.setValueAt(vols.get(i).getNumber() + "", i, 0);
+				int size = shownVols.size();
+				for (int i = 0; i < size; i++) {
+					Volume v = shownVols.get(i);
+					volT.setValueAt(v.getNumber() + "", i, 0);
 					if (v.isMounted()) {
-						volT.setValueAt(vols.get(i).getLetterColon() + "", i, 1);
-						volT.setValueAt(vols.get(i).getLabel(), i, 2);
-						volT.setValueAt(vols.get(i).getSize() + " " + vols.get(i).getGK() + "B", i, 3);
+						volT.setValueAt(v.getLetterColon() + "", i, 1);
+						volT.setValueAt(v.getLabel(), i, 2);
+						volT.setValueAt(v.getSize() + " " + v.getGK() + "B", i, 3);
 					} else {
 						volT.setValueAt("UNMOUNTED", i, 1);
 					}
-
 				}
-				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + vols.size() + (vols.size() > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
-						: (vols.size() == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
+				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + size + (size > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
+						: (size == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
 			}
 		});
 	}
@@ -265,8 +340,18 @@ public class MainWindow extends JFrame {
 			@Override
 			public void run() {
 				updateStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
+				if (shownVols != null)
+					shownVols.clear();
 				vols = new DiskPartProcess().getVolumes();
 				if (vols != null) {
+					if (showHD) {
+						shownVols = vols;
+					} else {
+						for (Volume v : vols) {
+							if (v.getType().equals("Removable"))
+								shownVols.add(v);
+						}
+					}
 					updateVolumeTableBox();
 					getAttributes();
 					cattr.setEnabled(true);
@@ -285,14 +370,22 @@ public class MainWindow extends JFrame {
 			@Override
 			public void run() {
 				if (attribs.size() > 0) {
+					int pos = 0;
 					for (int i = 0; i < attribs.size(); i++) {
-						volT.getModel().setValueAt(attribs.get(i) ? "Yes" : "No", i, 4);
+						Volume v = vols.get(i);
+						if (!showHD) {
+							if (!v.getType().equals("Removable")) {
+								continue;
+							}
+						}
+						volT.getModel().setValueAt(attribs.get(i) ? "Yes" : "No", pos, 4);
+						pos++;
 					}
 				} else {
 					updateStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
 				}
 			}
-			
+
 		});
 	}
 

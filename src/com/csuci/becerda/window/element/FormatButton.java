@@ -9,24 +9,16 @@ import com.csuci.becerda.window.FormatWindow;
 import com.csuci.becerda.window.MainWindow;
 
 @SuppressWarnings("serial")
-public class FormatButton extends JButton{
+public class FormatButton extends BaseButton{
 
-	private final int width = 90;
-	private final int height = 20;
-	
 	public FormatButton(MainWindow mw, int x, int y){
-		super("Format");
-		setBounds(x, y, width, height);
-		setVisible(true);
-		addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(mw.isValidVolume()){
-					new FormatWindow(mw, mw.getSelectedVolume());
-				}
-			}
-		});
-		mw.getContentPane().add(this);
+		super(mw, "Format", x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(mw.isValidVolume()){
+			new FormatWindow(mw, mw.getSelectedVolume());
+		}
 	}
 }
