@@ -29,6 +29,10 @@ public class FormatOptions {
 		label = "";
 	}
 
+	public void setFs(int index){
+		f = fs[index];
+	}
+	
 	public void setFsDefault() {
 		f = fs[0];
 	}
@@ -43,6 +47,10 @@ public class FormatOptions {
 
 	public void setFsexFAT() {
 		f = fs[3];
+	}
+	
+	public void setUnitSize(int index){
+		unit = index;
 	}
 
 	public void setUnitSize512() {

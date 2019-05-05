@@ -1,5 +1,6 @@
 package com.csuci.becerda.window;
 
+import java.awt.Choice;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -9,7 +10,6 @@ import java.awt.event.KeyListener;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -32,6 +32,8 @@ public class FormatWindow extends JFrame {
 	private JTextField label;
 	private JButton apply;
 	private JButton cancel;
+	private Choice unit;
+	private Choice fs;
 
 	public FormatWindow(MainWindow mw, Volume v) {
 		super();
@@ -101,29 +103,13 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addFSComboBox() {
-		JComboBox<String> fs = new JComboBox<String>(FormatOptions.fs);
+		fs = new Choice();
 		fs.setBounds(5 + 75, 10 + 20 + 5, 100, 20);
-		fs.setEditable(false);
-		fs.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switch (fs.getSelectedIndex()) {
-				case 0:
-					fo.setFsDefault();
-					break;
-				case 1:
-					fo.setFsNTFS();
-					break;
-				case 2:
-					fo.setFsFAT32();
-					break;
-				case 3:
-					fo.setFsexFAT();
-					break;
-				}
-			}
-		});
+		
+		for(String s : FormatOptions.fs){
+			fs.add(s);
+		}
+		
 		getContentPane().add(fs);
 		fs.setVisible(true);
 	}
@@ -133,71 +119,13 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addUnitComboBox() {
-		JComboBox<String> unit = new JComboBox<String>(FormatOptions.unitsize);
+		unit = new Choice();
 		unit.setBounds(5 + 75, 10 + 40 + 10, 100, 20);
-		unit.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				switch (unit.getSelectedIndex()) {
-				case 0:
-					fo.setUnitSizeDefault();
-					break;
-				case 1:
-					fo.setUnitSize512();
-					break;
-				case 2:
-					fo.setUnitSize1024();
-					break;
-				case 3:
-					fo.setUnitSize2048();
-					break;
-				case 4:
-					fo.setUnitSize4096();
-					break;
-				case 5:
-					fo.setUnitSize8192();
-					break;
-				case 6:
-					fo.setUnitSize16K();
-					break;
-				case 7:
-					fo.setUnitSize32K();
-					break;
-				case 8:
-					fo.setUnitSize64K();
-					break;
-				case 9:
-					fo.setUnitSize128K();
-					break;
-				case 10:
-					fo.setUnitSize256K();
-					break;
-				case 11:
-					fo.setUnitSize512K();
-					break;
-				case 12:
-					fo.setUnitSize1024K();
-					break;
-				case 13:
-					fo.setUnitSize2048K();
-					break;
-				case 14:
-					fo.setUnitSize4096K();
-					break;
-				case 15:
-					fo.setUnitSize8192K();
-					break;
-				case 16:
-					fo.setUnitSize16384K();
-					break;
-				case 17:
-					fo.setUnitSize32768K();
-					break;
-				}
-				
-			}
-		});
+		
+		for(String s : FormatOptions.unitsize){
+			unit.add(s);
+		}
+		
 		getContentPane().add(unit);
 		unit.setVisible(true);
 	}
@@ -226,6 +154,10 @@ public class FormatWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fo.setLabel(label.getText());
+				
+				fo.setUnitSize(unit.getSelectedIndex());
+				
+				fo.setFs(fs.getSelectedIndex());
 
 				int resp = JOptionPane.showConfirmDialog(FormatWindow.this,
 						"Are You Sure You Want To Format " + v.getLetterColon() + "?", "Confirm Format",
