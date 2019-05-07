@@ -136,7 +136,6 @@ public class RenameWindow extends JFrame {
 						JOptionPane.ERROR_MESSAGE);
 				apply.setEnabled(true);
 				cancel.setEnabled(true);
-				RenameWindow.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
 		}
 	}

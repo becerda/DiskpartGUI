@@ -14,6 +14,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
@@ -22,6 +23,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import com.csuci.becerda.process.DiskPartProcess;
+import com.csuci.becerda.properties.Config;
 import com.csuci.becerda.volume.Volume;
 import com.csuci.becerda.window.element.BaseButton;
 import com.csuci.becerda.window.element.BitLockButton;
@@ -36,12 +38,11 @@ public class MainWindow extends JFrame {
 
 	// Main Window Vars
 	private final int MAIN_WINDOW_HEIGHT = 225;
-	private final int MAIN_WINDOW_WIDTH = 450;
+	private final int MAIN_WINDOW_WIDTH = 445;
 	private final String MAIN_WINDOW_TITLE = "Diskpart GUI";
 
 	private final int MAIN_WINDOW_LARGE_PADDING = 15;
 	private final int MAIN_WINDOW_SMALL_PADDING = 5;
-	private final int MAIN_WINDOW_DEFAULT_BUTTON_H = 20;
 	private final int MAIN_WINDOW_DEFAULT_BUTTON_W = BaseButton.DEFAULT_WIDTH;
 
 	private final int MAIN_WINDOW_DEFAULT_X = 10;
@@ -72,7 +73,7 @@ public class MainWindow extends JFrame {
 	private final int MAIN_WINDOW_CB_X = MAIN_WINDOW_VOL_LAB_X;
 	private final int MAIN_WINDOW_CB_Y = MAIN_WINDOW_VOL_LAB_Y + MAIN_WINDOW_VOL_LAB_H + MAIN_WINDOW_SMALL_PADDING;
 	private final int MAIN_WINDOW_CB_W = MAIN_WINDOW_WIDTH - MAIN_WINDOW_LARGE_PADDING - MAIN_WINDOW_DEFAULT_X;
-	private final int MAIN_WINDOW_CB_H = 20 * 5;
+	private final int MAIN_WINDOW_CB_H = 21 * 5;
 	private final String[] VOL_TABLE_COL_NAMES = { "Number", "Letter", "Name", "Size", "Read-Only" };
 
 	// Refresh Button Vars
@@ -104,11 +105,8 @@ public class MainWindow extends JFrame {
 
 	// ReadOnly Button Vars
 	private final int MAIN_WINDOW_READONLY_BUTTON_X = MAIN_WINDOW_BL_BUTTON_X + MAIN_WINDOW_DEFAULT_BUTTON_W
-			+ MAIN_WINDOW_SMALL_PADDING;// MAIN_WINDOW_EJECT_BUTTON_X;
-	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;// MAIN_WINDOW_EJECT_BUTTON_Y
-																					// +
-																					// MAIN_WINDOW_EJECT_BUTTON_H
-	// + MAIN_WINDOW_SMALL_PADDING;
+			+ MAIN_WINDOW_SMALL_PADDING;
+	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
 
 	private JTable volT;
 	private JButton cattr;
@@ -119,8 +117,6 @@ public class MainWindow extends JFrame {
 	private ArrayList<Boolean> attribs;
 	private ArrayList<Volume> vols;
 	private ArrayList<Volume> shownVols;
-
-	private boolean showHD = true;
 
 	public MainWindow() {
 		super();
@@ -173,19 +169,44 @@ public class MainWindow extends JFrame {
 		JMenu view = new JMenu("View");
 		view.setMnemonic(KeyEvent.VK_O);
 
-		JCheckBoxMenuItem showHardDrives = new JCheckBoxMenuItem("Show Hard Drives");
-		showHardDrives.setMnemonic(KeyEvent.VK_H);
-		showHardDrives.setSelected(true);
-		showHardDrives.addItemListener(new ItemListener() {
+		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem("Show All Drives");
+		showVolumes.setMnemonic(KeyEvent.VK_H);
+		if (Config.getShowAllVolumes())
+			showVolumes.setSelected(true);
+		else
+			showVolumes.setSelected(false);
+		showVolumes.addItemListener(new ItemListener() {
 
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
-					showHD = true;
+					Config.setShowAllVolumes(true);
 				} else {
-					showHD = false;
+					Config.setShowAllVolumes(false);
 				}
+				Config.saveConfig();
 				refresh();
+			}
+		});
+
+		JMenuItem maxVolumeShown = new JMenuItem("Max Volumes");
+		maxVolumeShown.setMnemonic(KeyEvent.VK_M);
+		maxVolumeShown.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String input = JOptionPane.showInputDialog(MainWindow.this, "New Maximum Shown Volumes(< 100):",
+						"Maximum Shown Volumes", JOptionPane.OK_CANCEL_OPTION);
+				try {
+					int max = Integer.parseInt(input);
+					Config.setMaxShownVolumes(max);
+					Config.saveConfig();
+					JOptionPane.showMessageDialog(MainWindow.this, "Please Restart For Changes To Take Affect!", "Restart Required", JOptionPane.INFORMATION_MESSAGE);
+				} catch (NumberFormatException nfe) {
+					JOptionPane.showMessageDialog(MainWindow.this,
+							"Please Enter A Number Greater Than 0 and Less Than 100!", "Error",
+							JOptionPane.ERROR_MESSAGE);
+				}
 			}
 		});
 
@@ -203,7 +224,9 @@ public class MainWindow extends JFrame {
 		});
 
 		file.add(exit);
-		view.add(showHardDrives);
+		view.add(showVolumes);
+		view.addSeparator();
+		view.add(maxVolumeShown);
 		help.add(about);
 
 		menu.add(file);
@@ -219,7 +242,7 @@ public class MainWindow extends JFrame {
 	}
 
 	private void addVolumeTable() {
-		volT = new JTable(new String[10][10], VOL_TABLE_COL_NAMES);
+		volT = new JTable(new String[Config.getMaxShownVolumes()][VOL_TABLE_COL_NAMES.length], VOL_TABLE_COL_NAMES);
 		for (int i = 0; i < volT.getColumnCount(); i++) {
 			Class<?> col_class = volT.getColumnClass(i);
 			volT.setDefaultEditor(col_class, null); // remove editor
@@ -312,7 +335,7 @@ public class MainWindow extends JFrame {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				clearVolumeTable();
-				int size = shownVols.size();
+				int size = Math.min(shownVols.size(), Config.getMaxShownVolumes());
 				for (int i = 0; i < size; i++) {
 					Volume v = shownVols.get(i);
 					volT.setValueAt(v.getNumber() + "", i, 0);
@@ -340,13 +363,15 @@ public class MainWindow extends JFrame {
 			@Override
 			public void run() {
 				updateStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
-				if (shownVols != null)
-					shownVols.clear();
 				vols = new DiskPartProcess().getVolumes();
 				if (vols != null) {
-					if (showHD) {
+					if (Config.getShowAllVolumes()) {
 						shownVols = vols;
 					} else {
+						if (shownVols == null)
+							shownVols = new ArrayList<Volume>();
+						else
+							shownVols.clear();
 						for (Volume v : vols) {
 							if (v.getType().equals("Removable"))
 								shownVols.add(v);
@@ -371,9 +396,10 @@ public class MainWindow extends JFrame {
 			public void run() {
 				if (attribs.size() > 0) {
 					int pos = 0;
-					for (int i = 0; i < attribs.size(); i++) {
+					int size = Math.min(attribs.size(), Config.getMaxShownVolumes());
+					for (int i = 0; i < size; i++) {
 						Volume v = vols.get(i);
-						if (!showHD) {
+						if (!Config.getShowAllVolumes()) {
 							if (!v.getType().equals("Removable")) {
 								continue;
 							}
