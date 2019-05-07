@@ -21,6 +21,22 @@ import com.csuci.becerda.volume.Volume;
 
 @SuppressWarnings("serial")
 public class FormatWindow extends JFrame {
+	
+	private final String TITLE = "Format";
+	private final String LABEL_LABEL = "Label:";
+	private final String LABEL_FS = "File System:";
+	private final String LABEL_US = "Unit Size:";
+	private final String LABEL_QUICK = "Quick";
+	private final String BUTTON_APPLY = "Apply";
+	private final String BUTTON_CANCEL = "Cancel";
+	private final String CONFIRM_FORMAT_DIALOG = "Are You Sure You Want To Format ";
+	private final String CONFIRM_FORMAT_DIALOG_Q = "?";
+	private final String CONFIRM_FORMAT_TITLE = "Confirm Format";
+	private final String TITLE_FORMATTING = "Formatting...";
+	private final String FORMAT_SUCCESS_DIALOG = "Format Successful";
+	private final String FORMAT_SUCCESS_TITLE = "Success";
+	private final String FORMAT_ERROR_DIALOG = "Error With Format";
+	private final String FORMAT_ERROR_TITLE = "Error";
 
 	private final int width = 250;
 	private final int height = 210;
@@ -44,7 +60,7 @@ public class FormatWindow extends JFrame {
 
 		setSize(width, height);
 		setLayout(null);
-		setTitle("Format");
+		setTitle(TITLE);
 		setLocationRelativeTo(null);
 		setResizable(false);
 
@@ -70,7 +86,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addLabelLabel() {
-		addLabel("Label:", 5, 10, 45, 20);
+		addLabel(LABEL_LABEL, 5, 10, 45, 20);
 	}
 
 	private void addLabelTextField() {
@@ -99,7 +115,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addFSLabel() {
-		addLabel("File System:", 5, 10 + 20 + 5, 75, 20);
+		addLabel(LABEL_FS, 5, 10 + 20 + 5, 75, 20);
 	}
 
 	private void addFSComboBox() {
@@ -115,7 +131,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addUnitLabel() {
-		addLabel("Unit Size:", 5, 10 + 40 + 10, 75, 20);
+		addLabel(LABEL_US, 5, 10 + 40 + 10, 75, 20);
 	}
 
 	private void addUnitComboBox() {
@@ -131,7 +147,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addQuckCheckBox() {
-		JCheckBox quick = new JCheckBox("Quick");
+		JCheckBox quick = new JCheckBox(LABEL_QUICK);
 		quick.setSelected(true);
 		quick.setBounds(5, 10 + 60 + 15, 100, 20);
 		quick.setVisible(true);
@@ -146,7 +162,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addApplyButton() {
-		apply = new JButton("Apply");
+		apply = new JButton(BUTTON_APPLY);
 		apply.setBounds(125 - 100 - 10, 150, 100, 20);
 		apply.setVisible(true);
 		apply.addActionListener(new ActionListener() {
@@ -160,24 +176,24 @@ public class FormatWindow extends JFrame {
 				fo.setFs(fs.getSelectedIndex());
 
 				int resp = JOptionPane.showConfirmDialog(FormatWindow.this,
-						"Are You Sure You Want To Format " + v.getLetterColon() + "?", "Confirm Format",
+						CONFIRM_FORMAT_DIALOG + v.getLetterColon() + CONFIRM_FORMAT_DIALOG_Q, CONFIRM_FORMAT_TITLE,
 						JOptionPane.YES_NO_OPTION);
 
 				if (resp == JOptionPane.OK_OPTION) {
 					apply.setEnabled(false);
 					cancel.setEnabled(false);
 					FormatWindow.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-					FormatWindow.this.setTitle("Formatting...");
+					FormatWindow.this.setTitle(TITLE_FORMATTING);
 					Thread form = new Thread(new Runnable() {
 
 						@Override
 						public void run() {
 							if (new DiskPartProcess().format(v, fo)) {
-								JOptionPane.showMessageDialog(FormatWindow.this, "Format Successful", "Success", JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_SUCCESS_DIALOG, FORMAT_SUCCESS_TITLE, JOptionPane.INFORMATION_MESSAGE);
 								mw.refresh();
 								dispose();
 							} else {
-								JOptionPane.showMessageDialog(FormatWindow.this, "Error With Format", "Error", JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_ERROR_DIALOG, FORMAT_ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 								apply.setEnabled(true);
 								cancel.setEnabled(true);
 								FormatWindow.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -194,7 +210,7 @@ public class FormatWindow extends JFrame {
 	}
 
 	private void addCancelButton() {
-		cancel = new JButton("Cancel");
+		cancel = new JButton(BUTTON_CANCEL);
 		cancel.setBounds(125 + 5, 150, 100, 20);
 		cancel.setVisible(true);
 		cancel.addActionListener(new ActionListener() {

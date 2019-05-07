@@ -1,6 +1,8 @@
 package com.csuci.becerda.volume;
 
 public class Volume {
+	
+	public static final String TYPE_REMOVABLE = "Removable";
 
 	private int number;
 	private char letter;

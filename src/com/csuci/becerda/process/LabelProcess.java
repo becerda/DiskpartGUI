@@ -6,11 +6,14 @@ import java.util.regex.Pattern;
 import com.csuci.becerda.volume.Volume;
 
 public class LabelProcess extends ProcessRunner{
+	
+	private final String PROCESS_NAME = "label";
+	private final String PR_REGEX = "Cannot change label\\.  This volume is write protected\\.";
 
 	
 	public LabelProcess(){
 		super();
-		setProcess("label");
+		setProcess(PROCESS_NAME);
 		
 	}
 	
@@ -22,8 +25,7 @@ public class LabelProcess extends ProcessRunner{
 	}
 	
 	private boolean parseRename(String input){
-		String regex = "Cannot change label\\.  This volume is write protected\\.";
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(PR_REGEX);
 		Matcher m = p.matcher(input);
 		if(m.find()){
 			return false;

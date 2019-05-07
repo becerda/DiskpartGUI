@@ -8,10 +8,12 @@ import com.csuci.becerda.window.MainWindow;
 
 public class Runner {
 
+	private static final String LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
+	
 	public static void main(String[] args) {
 		
 		try {
-			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			UIManager.setLookAndFeel(LOOK_AND_FEEL);
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (InstantiationException e) {

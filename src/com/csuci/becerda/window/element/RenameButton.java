@@ -7,9 +7,12 @@ import com.csuci.becerda.window.RenameWindow;
 
 @SuppressWarnings("serial")
 public class RenameButton extends BaseButton {
+	
+	// Constants
+		private static final String TITLE = "Rename";
 
 	public RenameButton(MainWindow mw, int x, int y) {
-		super(mw, "Rename", x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);		
+		super(mw, TITLE, x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);		
 	}
 
 	@Override

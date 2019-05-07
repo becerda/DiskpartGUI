@@ -11,18 +11,62 @@ import java.util.regex.Pattern;
 import com.csuci.becerda.volume.Volume;
 
 public class DiskPartProcess extends ProcessRunner {
-	
-	public static final int PROCESS_EXIT_CODE_OK = 0;
-	public static final int PROCESS_EXIT_CODE_ERR = 1;
 
+	// General Strings
+	private final String PROCESS_NAME = "diskpart";
+	private final String CMD_ARG_SCRIPT = "/s";
+	private final String SCRIPT_FILE_NAME = "dpgscript";
+	private final String SCRIPT_FILE_EXT = ".txt";
+	private final String SELECT_DISK = "SELECT DISK ";
+	private final String ATTRIBUTE_DISK = "ATTRIBUTE DISK ";
+	private final String SELECT_VOLUME = "SELECT VOLUME ";
+	private final String LIST_VOLUME = "LIST VOLUME";
+
+	// Set Read Only Strings
+	private final String RO_SET = "SET";
+	private final String RO_CLEAR = "CLEAR";
+	private final String RO_READONLY = " READONLY";
+	private final String PRO_REGEX = "Disk attributes (set|cleared) successfully.";
+
+	// Format Strings
+	private final String F_FORMAT = "FORMAT ";
+	private final String F_FORMAT_NTSF = "FS=NTSF ";
+	private final String F_FORMAT_EXFAT = "FS=exFAT ";
+	private final String F_FORMAT_FAT32 = "FS=FAT32 ";
+	private final String F_UNIT = "UNIT=";
+	private final String F_LABEL = "LABEL=";
+	private final String F_QUICK = "QUICK";
+	private final String PF_REGEX = "DiskPart successfully formatted the volume.";
+
+	// Attribute Strings
+	private final String PA_REGEX = "Read-only  : (?<set>Yes|No)";
+
+	// Volume Strings
+	private final String PV_REGEX = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z ])( ){3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT| )( ){2,6}(?<voltype>Partition|Removable)( ){4,5}(?<volsize>[1-9]{1,3})( )(?<volgk>K|G)B( ){2}(?<volstat>Healthy)( ){0,4}(?<volinfo>[a-zA-Z]+)?";
+	private final String PV_REGEX_GROUP_VOL_NUM = "volnum";
+	private final String PV_REGEX_GROUP_VOL_LET = "vollet";
+	private final String PV_REGEX_GROUP_VOL_LAB = "vollab";
+	private final String PV_REGEX_GROUP_VOL_FS = "volfs";
+	private final String PV_REGEX_GROUP_VOL_TYPE = "voltype";
+	private final String PV_REGEX_GROUP_VOL_SIZ = "volsize";
+	private final String PV_REGEX_GROUP_VOL_GK = "volgk";
+	private final String PV_REGEX_GROUP_VOL_STAT = "volstat";
+	private final String PV_REGEX_GROUP_VOL_INFO = "volinfo";
+	
+	// Unmount Strings
+	private final String U_REMOVE = "REMOVE ALL DISMOUNT";
+	private final String U_ASSIGN = "ASSIGN";
+	private final String PU_REGEX_U = "DiskPart successfully dismounted and offlined the volume.";
+	private final String PU_REGEX_A = "DiskPart successfully assigned the drive letter or mount point.";
+	
 	private ArrayList<String> scriptCommands;
 	private File script;
 	private String scriptName;
 
 	public DiskPartProcess() {
 		super();
-		setProcess("diskpart");
-		addArg("/s");
+		setProcess(PROCESS_NAME);
+		addArg(CMD_ARG_SCRIPT);
 		scriptCommands = new ArrayList<String>();
 
 	}
@@ -33,7 +77,7 @@ public class DiskPartProcess extends ProcessRunner {
 
 	private void writeScript() {
 		try {
-			script = File.createTempFile("dpgscript", ".txt");
+			script = File.createTempFile(SCRIPT_FILE_NAME, SCRIPT_FILE_EXT);
 			script.deleteOnExit();
 
 			scriptName = script.getAbsolutePath();
@@ -48,54 +92,53 @@ public class DiskPartProcess extends ProcessRunner {
 			e.printStackTrace();
 		}
 	}
-	
-	public boolean setReadOnly(Volume v){
+
+	public boolean setReadOnly(Volume v) {
 		return setReadOnly(v, true);
 	}
-	
-	public boolean clearReadOnly(Volume v){
+
+	public boolean clearReadOnly(Volume v) {
 		return setReadOnly(v, false);
 	}
-	
-	private boolean setReadOnly(Volume v, boolean set){
-		addToScript("SELECT DISK " + v.getNumber());
-		addToScript("ATTRIBUTE DISK " + (set ? "SET" : "CLEAR") + " READONLY");
+
+	private boolean setReadOnly(Volume v, boolean set) {
+		addToScript(SELECT_DISK + v.getNumber());
+		addToScript(ATTRIBUTE_DISK + (set ? RO_SET : RO_CLEAR) + RO_READONLY);
 		writeScript();
 		String output = run();
 		return parseReadOnly(output);
 	}
-	
-	private boolean parseReadOnly(String input){
-		String regex = "Disk attributes (set|cleared) successfully.";
-		Pattern p = Pattern.compile(regex);
+
+	private boolean parseReadOnly(String input) {
+		Pattern p = Pattern.compile(PRO_REGEX);
 		Matcher m = p.matcher(input);
-		if(m.find()){
+		if (m.find()) {
 			return true;
 		}
 		return false;
 	}
 
 	public boolean format(Volume v, FormatOptions fo) {
-		addToScript("SELECT VOLUME " + v.getNumber());
+		addToScript(SELECT_VOLUME + v.getNumber());
 		StringBuilder sb = new StringBuilder();
-		sb.append("FORMAT ");
+		sb.append(F_FORMAT);
 		if (!fo.isFsDefault()) {
 			if (fo.isFsNTSF()) {
-				sb.append("FS=NTSF ");
+				sb.append(F_FORMAT_NTSF);
 			} else if (fo.isFsexFAT()) {
-				sb.append("FS=exFAT ");
+				sb.append(F_FORMAT_EXFAT);
 			} else if (fo.isFsFAT32()) {
-				sb.append("FS=FAT32 ");
+				sb.append(F_FORMAT_FAT32);
 			}
 		}
 		if (!fo.isUnitSizeDefault()) {
-			sb.append("UNIT=" + fo.getUnit() + " ");
+			sb.append(F_UNIT + fo.getUnit() + " ");
 		}
 		if (fo.isLabelSet()) {
-			sb.append("LABEL=" + fo.getLabel() + " ");
+			sb.append(F_LABEL + fo.getLabel() + " ");
 		}
 		if (fo.isQuick()) {
-			sb.append("QUICK");
+			sb.append(F_QUICK);
 		}
 		addToScript(sb.toString());
 		writeScript();
@@ -105,8 +148,7 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	private boolean parseFormat(String input) {
-		String regex = "DiskPart successfully formatted the volume.";
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(PF_REGEX);
 		Matcher m = p.matcher(input);
 		if (m.find()) {
 			return true;
@@ -116,8 +158,8 @@ public class DiskPartProcess extends ProcessRunner {
 
 	public ArrayList<Boolean> getAttributes(ArrayList<Volume> vols) {
 		for (Volume v : vols) {
-			addToScript("SELECT DISK " + v.getNumber());
-			addToScript("ATTRIBUTE DISK");
+			addToScript(SELECT_DISK + v.getNumber());
+			addToScript(ATTRIBUTE_DISK);
 		}
 		writeScript();
 		String output = run();
@@ -126,8 +168,7 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	private ArrayList<Boolean> parseAttributes(String input) {
-		String regex = "Read-only  : (?<set>Yes|No)";
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(PA_REGEX);
 		Matcher m = p.matcher(input);
 		ArrayList<Boolean> attrs = new ArrayList<Boolean>();
 		while (m.find()) {
@@ -137,7 +178,7 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	public ArrayList<Volume> getVolumes() {
-		addToScript("LIST VOLUME");
+		addToScript(LIST_VOLUME);
 		writeScript();
 		String output = run();
 		script.delete();
@@ -145,59 +186,56 @@ public class DiskPartProcess extends ProcessRunner {
 	}
 
 	private ArrayList<Volume> parseVolumes(String input) {
-		String regex = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z ])( ){3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT| )( ){2,6}(?<voltype>Partition|Removable)( ){4,5}(?<volsize>[1-9]{1,3})( )(?<volgk>K|G)B( ){2}(?<volstat>Healthy)( ){0,4}(?<volinfo>[a-zA-Z]+)?";
-		Pattern p = Pattern.compile(regex);
+		Pattern p = Pattern.compile(PV_REGEX);
 		Matcher m = p.matcher(input);
 		ArrayList<Volume> vols = new ArrayList<Volume>();
 		while (m.find()) {
 			Volume v = new Volume();
-			v.setNumber(Integer.parseInt(m.group("volnum")));
-			v.setLetter(m.group("vollet").charAt(0));
-			v.setLabel(m.group("vollab"));
-			v.setFs(m.group("volfs"));
-			v.setType(m.group("voltype"));
-			v.setSize(Integer.parseInt(m.group("volsize")));
-			v.setGk(m.group("volgk").charAt(0));
-			v.setStatus(m.group("volstat"));
-			v.setInfo(m.group("volinfo")); 
+			v.setNumber(Integer.parseInt(m.group(PV_REGEX_GROUP_VOL_NUM)));
+			v.setLetter(m.group(PV_REGEX_GROUP_VOL_LET).charAt(0));
+			v.setLabel(m.group(PV_REGEX_GROUP_VOL_LAB));
+			v.setFs(m.group(PV_REGEX_GROUP_VOL_FS));
+			v.setType(m.group(PV_REGEX_GROUP_VOL_TYPE));
+			v.setSize(Integer.parseInt(m.group(PV_REGEX_GROUP_VOL_SIZ)));
+			v.setGk(m.group(PV_REGEX_GROUP_VOL_GK).charAt(0));
+			v.setStatus(m.group(PV_REGEX_GROUP_VOL_STAT));
+			v.setInfo(m.group(PV_REGEX_GROUP_VOL_INFO));
 			vols.add(v);
 		}
 
 		return vols;
 	}
-	
-	public boolean ejectVolume(Volume v){
-		addToScript("SELECT VOLUME " + v.getNumber());
-		addToScript("REMOVE ALL DISMOUNT");
+
+	public boolean ejectVolume(Volume v) {
+		addToScript(SELECT_VOLUME + v.getNumber());
+		addToScript(U_REMOVE);
 		writeScript();
 		String output = run();
 		script.delete();
 		return parseEject(output);
 	}
-	
-	private boolean parseEject(String input){
-		String regex = "DiskPart successfully dismounted and offlined the volume.";
-		Pattern p = Pattern.compile(regex);
+
+	private boolean parseEject(String input) {
+		Pattern p = Pattern.compile(PU_REGEX_U);
 		Matcher m = p.matcher(input);
-		if(m.find()){
+		if (m.find()) {
 			return true;
 		}
 		return false;
 	}
-	
-	public boolean assignVolume(Volume v){
-		addToScript("SELECT VOLUME " + v.getNumber());
-		addToScript("ASSIGN");
+
+	public boolean assignVolume(Volume v) {
+		addToScript(SELECT_VOLUME + v.getNumber());
+		addToScript(U_ASSIGN);
 		writeScript();
 		String output = run();
 		return parseAssign(output);
 	}
-	
-	public boolean parseAssign(String input){
-		String regex = "DiskPart successfully assigned the drive letter or mount point.";
-		Pattern p = Pattern.compile(regex);
+
+	public boolean parseAssign(String input) {
+		Pattern p = Pattern.compile(PU_REGEX_A);
 		Matcher m = p.matcher(input);
-		if(m.find()){
+		if (m.find()) {
 			return true;
 		}
 		return false;

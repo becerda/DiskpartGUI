@@ -13,6 +13,14 @@ public class UMountButton extends BaseButton {
 
 	public static final String EJECT = "Eject";
 	public static final String MOUNT = "Mount";
+	
+	private final String FAILED_TITLE = "Error";
+	private final String SUCCESS_EJECT_TITLE = "Ejected";
+	private final String SUCCESS_EJECT_DIALOG = "Safely Ejected ";
+	private final String FAILED_EJECT_DIALOG = "Failed To Eject ";
+	private final String SUCCESS_MOUNT_TITLE = "Mounted";
+	private final String SUCCESS_MOUNT_DIALOG = "Volume Mounted!";
+	private final String FAILED_MOUNT_DIALOG = "Failed To Mount Volume!";
 
 	public UMountButton(MainWindow mw, int x, int y) {
 		super(mw, "Eject", x, y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
@@ -25,25 +33,25 @@ public class UMountButton extends BaseButton {
 			if (mw.isValidVolume()) {
 				if (new DiskPartProcess().ejectVolume(mw.getSelectedVolume())) {
 					JOptionPane.showMessageDialog(mw,
-							"Safely Ejected " + mw.getSelectedVolume().getLetterColon(), "Ejected",
+							SUCCESS_EJECT_DIALOG + mw.getSelectedVolume().getLetterColon(), SUCCESS_EJECT_TITLE,
 							JOptionPane.INFORMATION_MESSAGE);
 					mw.refresh();
 					setText(MOUNT);
 				} else {
 					JOptionPane.showMessageDialog(mw,
-							"Failed To Eject " + mw.getSelectedVolume().getLetterColon(), "Error",
+							FAILED_EJECT_DIALOG + mw.getSelectedVolume().getLetterColon(), FAILED_TITLE,
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		} else {
 			if (new DiskPartProcess().assignVolume(v)) {
-				JOptionPane.showMessageDialog(mw, "Volume Mounted!", "Mounted",
+				JOptionPane.showMessageDialog(mw, SUCCESS_MOUNT_DIALOG, SUCCESS_MOUNT_TITLE,
 						JOptionPane.INFORMATION_MESSAGE);
 				mw.refresh();
 				setText(EJECT);
 			} else {
-				JOptionPane.showMessageDialog(mw, "Failed To Mount Volume",
-						"Error", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(mw, FAILED_MOUNT_DIALOG,
+						FAILED_TITLE, JOptionPane.ERROR_MESSAGE);
 			}
 		}
 	}

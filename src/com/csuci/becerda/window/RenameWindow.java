@@ -16,7 +16,18 @@ import com.csuci.becerda.volume.Volume;
 
 @SuppressWarnings("serial")
 public class RenameWindow extends JFrame {
-
+	
+	private final String LABEL_NEW_LABEL = "New Label For Volume ";
+	private final String BUTTON_APPLY = "Apply";
+	private final String BUTTON_CANCEL = "CANCEL";
+	private final String CONFIRM_DIALOG_1 = "Are You Sure You Want To Rename ";
+	private final String CONFIRM_DIALOG_2 = " To ";
+	private final String CONFIRM_TITLE = "Confirm Rename";
+	private final String SUCCESS_DIALOG = "Rename Successful!";
+	private final String SUCCESS_TITLE = "Success";
+	private final String ERROR_DIALOG = "Error with rename!";
+	private final String ERROR_TITLE = "Error";
+	
 	private final int width = 180;
 	private final int height = 130;
 
@@ -54,7 +65,7 @@ public class RenameWindow extends JFrame {
 	}
 
 	private void addLabel() {
-		addLabel("New Label For Volume " + mw.getSelectedVolume().getLetterColon(), 10, 10, 150, 20);
+		addLabel(LABEL_NEW_LABEL + mw.getSelectedVolume().getLetterColon(), 10, 10, 150, 20);
 	}
 
 	private void addTextField() {
@@ -88,7 +99,7 @@ public class RenameWindow extends JFrame {
 	}
 
 	private void addApplyButton() {
-		apply = new JButton("Apply");
+		apply = new JButton(BUTTON_APPLY);
 		apply.setBounds(10, 60, 75, 20);
 		apply.setVisible(true);
 		apply.addActionListener(new ActionListener() {
@@ -103,7 +114,7 @@ public class RenameWindow extends JFrame {
 	}
 
 	private void addCancelButton() {
-		cancel = new JButton("Cancel");
+		cancel = new JButton(BUTTON_CANCEL);
 		cancel.setBounds(90, 60, 75, 20);
 		cancel.setVisible(true);
 		cancel.addActionListener(new ActionListener() {
@@ -118,7 +129,7 @@ public class RenameWindow extends JFrame {
 	
 	private void runRename(){
 		int resp = JOptionPane.showConfirmDialog(RenameWindow.this,
-				"Are You Sure You Want To Rename " + v.getLetterColon() + " To " + tf.getText().toUpperCase(), "Confirm Rename",
+				CONFIRM_DIALOG_1 + v.getLetterColon() + CONFIRM_DIALOG_2 + tf.getText().toUpperCase(), CONFIRM_TITLE,
 				JOptionPane.YES_NO_OPTION);
 
 		if (resp == JOptionPane.OK_OPTION) {
@@ -127,12 +138,12 @@ public class RenameWindow extends JFrame {
 			RenameWindow.this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 			RenameWindow.this.setTitle("Renameing...");
 			if (new LabelProcess().rename(v, tf.getText().trim())) {
-				JOptionPane.showMessageDialog(RenameWindow.this, "Rename Successful", "Success",
+				JOptionPane.showMessageDialog(RenameWindow.this, SUCCESS_DIALOG, SUCCESS_TITLE,
 						JOptionPane.INFORMATION_MESSAGE);
 				mw.refresh();
 				dispose();
 			} else {
-				JOptionPane.showMessageDialog(RenameWindow.this, "Error with rename", "Error",
+				JOptionPane.showMessageDialog(RenameWindow.this, ERROR_DIALOG, ERROR_TITLE,
 						JOptionPane.ERROR_MESSAGE);
 				apply.setEnabled(true);
 				cancel.setEnabled(true);

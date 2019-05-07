@@ -5,6 +5,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class ProcessRunner {
+	
+	public static final int PROCESS_EXIT_CODE_OK = 0;
+	public static final int PROCESS_EXIT_CODE_ERR = 1;
 
 	ArrayList<String> args;
 	String processName;

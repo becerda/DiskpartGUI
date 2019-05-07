@@ -56,11 +56,36 @@ public class MainWindow extends JFrame {
 	private final String MAIN_WINDOW_STATUS_SEP = " - ";
 	private final String MAIN_WINDOW_STATUS_FAILED_FIND_VOLS = "Failed To Find Volumes";
 	private final String MAIN_WINDOW_STATUS_FOUND_1 = "Finished, Found ";
-	private final String MAIN_WINDOW_STATUS_FOUND_2 = " Volume";
+	private final String MAIN_WINDOW_STATUS_FOUND_2 = " Volume ";
 	private final String MAIN_WINDOW_STATUS_FOUND_2S = " Volumes";
 	private final String MAIN_WINDOW_STATUS_SELECTED_VOL = "Selected Volume ";
 	private final String MAIN_WINDOW_STATUS_SELECTED_NONE = "No Volume Selected";
 	private final String MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
+	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED = "Volume Is Not Mounted";
+	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE = " Is Not Removable";
+	
+	// Volume Table Vars
+	private final String MAIN_WINDOW_TABLE_BYTE = "B";
+	private final String MAIN_WINOW_TABLE_UNMOUNTED = "UNMOUNTED";
+	private final String MAIN_WINOW_TABLE_YES = "Yes";
+	private final String MAIN_WINOW_TABLE_NO = "No";
+	
+	// Main Window Menu Bar Vars
+	private final String MAIN_WINDOW_MENU_FILE = "File";
+	private final String MAIN_WINDOW_MENU_FILE_EXIT = "Exit";
+	
+	private final String MAIN_WINDOW_MENU_VIEW = "View";
+	private final String MAIN_WINDOW_MENU_VIEW_SAV = "Show All Volumes";
+	private final String MAIN_WINDOW_MENU_VIEW_MV = "Max Volumes";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG = "New Maximum Shown Volumes (< 100):";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE = "Maximum Shown Volumes";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS = "Please Restart For Changes To Take Affect!";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS = "Restart Required";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR = "Please Enter A Number Greater Than 0 And Less Than 100!";
+	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR = "Error";
+	
+	private final String MAIN_WINDOW_MENU_HELP = "Help";
+	private final String MAIN_WINDOW_MENU_HELP_ABOUT = "About";
 
 	// Volume Label Vars
 	private final String MAIN_WINDOW_VOL_LABEL = "Volume: ";
@@ -152,12 +177,11 @@ public class MainWindow extends JFrame {
 	private void addMenuBar() {
 		JMenuBar menu = new JMenuBar();
 
-		JMenu file = new JMenu("File");
+		JMenu file = new JMenu(MAIN_WINDOW_MENU_FILE);
 		file.setMnemonic(KeyEvent.VK_F);
 
-		JMenuItem exit = new JMenuItem("Exit");
+		JMenuItem exit = new JMenuItem(MAIN_WINDOW_MENU_FILE_EXIT);
 		exit.setMnemonic(KeyEvent.VK_E);
-		exit.setToolTipText("Exits Application");
 		exit.addActionListener(new ActionListener() {
 
 			@Override
@@ -166,10 +190,10 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		JMenu view = new JMenu("View");
+		JMenu view = new JMenu(MAIN_WINDOW_MENU_VIEW);
 		view.setMnemonic(KeyEvent.VK_O);
 
-		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem("Show All Drives");
+		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_VIEW_SAV);
 		showVolumes.setMnemonic(KeyEvent.VK_H);
 		if (Config.getShowAllVolumes())
 			showVolumes.setSelected(true);
@@ -189,31 +213,31 @@ public class MainWindow extends JFrame {
 			}
 		});
 
-		JMenuItem maxVolumeShown = new JMenuItem("Max Volumes");
+		JMenuItem maxVolumeShown = new JMenuItem(MAIN_WINDOW_MENU_VIEW_MV);
 		maxVolumeShown.setMnemonic(KeyEvent.VK_M);
 		maxVolumeShown.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String input = JOptionPane.showInputDialog(MainWindow.this, "New Maximum Shown Volumes(< 100):",
-						"Maximum Shown Volumes", JOptionPane.OK_CANCEL_OPTION);
+				String input = JOptionPane.showInputDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG,
+						MAIN_WINDOW_MENU_VIEW_MV_TITLE, JOptionPane.OK_CANCEL_OPTION);
 				try {
 					int max = Integer.parseInt(input);
 					Config.setMaxShownVolumes(max);
 					Config.saveConfig();
-					JOptionPane.showMessageDialog(MainWindow.this, "Please Restart For Changes To Take Affect!", "Restart Required", JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS, MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
 				} catch (NumberFormatException nfe) {
 					JOptionPane.showMessageDialog(MainWindow.this,
-							"Please Enter A Number Greater Than 0 and Less Than 100!", "Error",
+							MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR, MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR,
 							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
 
-		JMenu help = new JMenu("Help");
+		JMenu help = new JMenu(MAIN_WINDOW_MENU_HELP);
 		help.setMnemonic(KeyEvent.VK_H);
 
-		JMenuItem about = new JMenuItem("About");
+		JMenuItem about = new JMenuItem(MAIN_WINDOW_MENU_HELP_ABOUT);
 		about.setMnemonic(KeyEvent.VK_A);
 		about.addActionListener(new ActionListener() {
 
@@ -279,7 +303,7 @@ public class MainWindow extends JFrame {
 				updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
 				umount.setText(UMountButton.EJECT);
 			} else {
-				updateStatus("Volume Is Not Mounted");
+				updateStatus(MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED);
 				umount.setText(UMountButton.MOUNT);
 			}
 		}
@@ -342,9 +366,9 @@ public class MainWindow extends JFrame {
 					if (v.isMounted()) {
 						volT.setValueAt(v.getLetterColon() + "", i, 1);
 						volT.setValueAt(v.getLabel(), i, 2);
-						volT.setValueAt(v.getSize() + " " + v.getGK() + "B", i, 3);
+						volT.setValueAt(v.getSize() + " " + v.getGK() + MAIN_WINDOW_TABLE_BYTE, i, 3);
 					} else {
-						volT.setValueAt("UNMOUNTED", i, 1);
+						volT.setValueAt(MAIN_WINOW_TABLE_UNMOUNTED, i, 1);
 					}
 				}
 				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + size + (size > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
@@ -373,7 +397,7 @@ public class MainWindow extends JFrame {
 						else
 							shownVols.clear();
 						for (Volume v : vols) {
-							if (v.getType().equals("Removable"))
+							if (v.getType().equals(Volume.TYPE_REMOVABLE))
 								shownVols.add(v);
 						}
 					}
@@ -400,11 +424,11 @@ public class MainWindow extends JFrame {
 					for (int i = 0; i < size; i++) {
 						Volume v = vols.get(i);
 						if (!Config.getShowAllVolumes()) {
-							if (!v.getType().equals("Removable")) {
+							if (!v.getType().equals(Volume.TYPE_REMOVABLE)) {
 								continue;
 							}
 						}
-						volT.getModel().setValueAt(attribs.get(i) ? "Yes" : "No", pos, 4);
+						volT.getModel().setValueAt(attribs.get(i) ? MAIN_WINOW_TABLE_YES : MAIN_WINOW_TABLE_NO, pos, 4);
 						pos++;
 					}
 				} else {
@@ -430,8 +454,8 @@ public class MainWindow extends JFrame {
 			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
 			return false;
 		}
-		if (!selVol.getType().equals("Removable")) {
-			updateStatus("Volume " + selVol.getLetterColon() + " Is Not Removable");
+		if (!selVol.getType().equals(Volume.TYPE_REMOVABLE)) {
+			updateStatus(MAIN_WINDOW_STATUS_FOUND_2 + selVol.getLetterColon() + MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE);
 			return false;
 		}
 		return true;
