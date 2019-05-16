@@ -3,10 +3,12 @@ GUI for Windows Diskpart
 
 ## Installation
 There are a few things required to run this application:
-1) DikspartGUI.jar (https://github.com/michaelsoltys/thumbdrivegui/raw/master/Launcher.zip)
-2) Launcher.bat 
-3) Java SE-1.8 (jre1.8.0_211) or later with PATH variable set
-4) Diskpart Gui Shortcut (Not required but helps run the launcher)
+1) Download Launcher.zip from: https://github.com/michaelsoltys/thumbdrivegui/raw/master/Launcher.zip
+	- Right-click zip file and extract to desired location.
+2) The current version of Java (jre8) or greater from: https://www.java.com/en/download/
+	- Follow instructions on link to install
+3) Set the PATH Variable: directions below.     aadfsfgsdfgs ffs  ffssdee
+4) Run through extracted "Dikspart Gui.lnk" or "Launcher.bat"
 
 ## How To Set PATH Variable
 1) Find location to java.exe, usually in 'C:\Program Files\Java\jre1.8.0_***\bin

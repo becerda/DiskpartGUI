@@ -63,17 +63,17 @@ public class MainWindow extends JFrame {
 	private final String MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
 	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED = "Volume Is Not Mounted";
 	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE = " Is Not Removable";
-	
+
 	// Volume Table Vars
 	private final String MAIN_WINDOW_TABLE_BYTE = "B";
 	private final String MAIN_WINOW_TABLE_UNMOUNTED = "UNMOUNTED";
 	private final String MAIN_WINOW_TABLE_YES = "Yes";
 	private final String MAIN_WINOW_TABLE_NO = "No";
-	
+
 	// Main Window Menu Bar Vars
 	private final String MAIN_WINDOW_MENU_FILE = "File";
 	private final String MAIN_WINDOW_MENU_FILE_EXIT = "Exit";
-	
+
 	private final String MAIN_WINDOW_MENU_VIEW = "View";
 	private final String MAIN_WINDOW_MENU_VIEW_SAV = "Show All Volumes";
 	private final String MAIN_WINDOW_MENU_VIEW_MV = "Max Volumes";
@@ -83,7 +83,7 @@ public class MainWindow extends JFrame {
 	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS = "Restart Required";
 	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR = "Please Enter A Number Greater Than 0 And Less Than 100!";
 	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR = "Error";
-	
+
 	private final String MAIN_WINDOW_MENU_HELP = "Help";
 	private final String MAIN_WINDOW_MENU_HELP_ABOUT = "About";
 
@@ -221,15 +221,18 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				String input = JOptionPane.showInputDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG,
 						MAIN_WINDOW_MENU_VIEW_MV_TITLE, JOptionPane.OK_CANCEL_OPTION);
-				try {
-					int max = Integer.parseInt(input);
-					Config.setMaxShownVolumes(max);
-					Config.saveConfig();
-					JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS, MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
-				} catch (NumberFormatException nfe) {
-					JOptionPane.showMessageDialog(MainWindow.this,
-							MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR, MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR,
-							JOptionPane.ERROR_MESSAGE);
+				if (input != null) {
+					try {
+						int max = Integer.parseInt(input);
+						Config.setMaxShownVolumes(max);
+						Config.saveConfig();
+						JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS,
+								MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
+					} catch (NumberFormatException nfe) {
+						nfe.printStackTrace();
+						JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR,
+								MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -455,7 +458,8 @@ public class MainWindow extends JFrame {
 			return false;
 		}
 		if (!selVol.getType().equals(Volume.TYPE_REMOVABLE)) {
-			updateStatus(MAIN_WINDOW_STATUS_FOUND_2 + selVol.getLetterColon() + MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE);
+			updateStatus(
+					MAIN_WINDOW_STATUS_FOUND_2 + selVol.getLetterColon() + MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE);
 			return false;
 		}
 		return true;
