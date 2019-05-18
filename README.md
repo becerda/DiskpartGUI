@@ -1,5 +1,6 @@
 # DiskpartGUI
 GUI for Windows Diskpart
+Version: 0.1
 
 ## Installation
 There are a few things required to run this application:
@@ -7,7 +8,7 @@ There are a few things required to run this application:
 	- Right-click zip file and extract to desired location.
 2) The current version of Java (jre8) or greater from: https://www.java.com/en/download/
 	- Follow instructions on link to install
-3) Set the PATH Variable: directions below.     aadfsfgsdfgs ffs  ffssdee
+3) Set the PATH Variable: directions below.
 4) Run through extracted "Dikspart Gui.lnk" or "Launcher.bat"
 
 ## How To Set PATH Variable

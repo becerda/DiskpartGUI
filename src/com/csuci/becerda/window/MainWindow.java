@@ -86,6 +86,7 @@ public class MainWindow extends JFrame {
 
 	private final String MAIN_WINDOW_MENU_HELP = "Help";
 	private final String MAIN_WINDOW_MENU_HELP_ABOUT = "About";
+	private final String MAIN_WINDOW_MENU_HELP_UPDATE = "Check For Update";
 
 	// Volume Label Vars
 	private final String MAIN_WINDOW_VOL_LABEL = "Volume: ";
@@ -195,10 +196,7 @@ public class MainWindow extends JFrame {
 
 		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_VIEW_SAV);
 		showVolumes.setMnemonic(KeyEvent.VK_H);
-		if (Config.getShowAllVolumes())
-			showVolumes.setSelected(true);
-		else
-			showVolumes.setSelected(false);
+		showVolumes.setSelected(Config.getShowAllVolumes());
 		showVolumes.addItemListener(new ItemListener() {
 
 			@Override
@@ -246,15 +244,33 @@ public class MainWindow extends JFrame {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				new AboutWindow();
 			}
 		});
+		
+		JCheckBoxMenuItem update = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_HELP_UPDATE);
+		update.setMnemonic(KeyEvent.VK_U);
+		update.setSelected(Config.getCheckForUpdate());
+		update.addItemListener(new ItemListener() {
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					Config.setCheckForUpdate(true);
+				} else {
+					Config.setCheckForUpdate(false);
+				}
+				Config.saveConfig();
+			}
+		});
+		
 
 		file.add(exit);
 		view.add(showVolumes);
 		view.addSeparator();
 		view.add(maxVolumeShown);
 		help.add(about);
+		help.add(update);
 
 		menu.add(file);
 		menu.add(view);
