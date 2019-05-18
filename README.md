@@ -1,6 +1,6 @@
 # DiskpartGUI
 GUI for Windows Diskpart
-Version: 0.1
+Version: 0.1:1
 
 ## Installation
 There are a few things required to run this application:
