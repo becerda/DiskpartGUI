@@ -1,5 +1,5 @@
-$url = "https://github.com/becerda/DiskpartGUI/raw/master/DiskPartGUI.jar"
+$url = "https://github.com/becerda/DiskpartGUI/raw/master/Launcher.zip"
 
-$output = "$PSScriptRoot\DiskPartGUINew.jar";
+$output = "$PSScriptRoot\NewLauncher.zip";
 
 (New-Object System.Net.WebClient).DownloadFile($url, $output);

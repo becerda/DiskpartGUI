@@ -1,9 +1,9 @@
 @echo off
-echo Downloading Updated DiskPartGUI...
+echo Downloading Updated Launcher.zip File...
 powershell.exe -noprofile -executionpolicy bypass -file .\dpguips.ps1
 
 echo Removing Old Version
-del /f DiskPartGUI.jar
-ren DiskPartGUINew.jar DiskPartGUI.jar
+del /f Launcher.zip
+ren NewLauncher.zip Launcher.zip
 echo Update Complete!
 pause
