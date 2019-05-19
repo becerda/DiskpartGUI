@@ -1,5 +1,5 @@
 @echo off
-echo Downloading Updated Launcher.zip File...
+echo Downloading Updated Laucher.zip File...
 powershell.exe -noprofile -executionpolicy bypass -file .\dpguips.ps1
 
 echo Removing Old Version
