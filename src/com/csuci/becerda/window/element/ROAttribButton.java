@@ -56,7 +56,7 @@ public class ROAttribButton extends BaseButton {
 				JOptionPane.showMessageDialog(mw,
 						"Successfully " + (set ? sc : sc + "ed") + " Read-Only Flag On Volume " + v.getLetterColon(),
 						sc + " Read-Only " + v.getLetterColon(), JOptionPane.INFORMATION_MESSAGE);
-				mw.updateStatus(v.getLetterColon() + " Read-Only Set");
+				mw.updateMainWindowStatus(v.getLetterColon() + " Read-Only Set");
 				mw.refresh();
 				if (set)
 					setText(READONLY_BUTTON_CLEAR);

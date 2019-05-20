@@ -11,7 +11,6 @@ import java.awt.event.KeyListener;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
@@ -20,9 +19,12 @@ import com.csuci.becerda.process.FormatOptions;
 import com.csuci.becerda.volume.Volume;
 
 @SuppressWarnings("serial")
-public class FormatWindow extends JFrame {
-	
-	private final String TITLE = "Format";
+public class FormatWindow extends BaseWindow {
+
+	private static final String TITLE = "Format";
+	private static final int WIDTH = 250;
+	private static final int HEIGHT = 210;
+
 	private final String LABEL_LABEL = "Label:";
 	private final String LABEL_FS = "File System:";
 	private final String LABEL_US = "Unit Size:";
@@ -38,9 +40,6 @@ public class FormatWindow extends JFrame {
 	private final String FORMAT_ERROR_DIALOG = "Error With Format";
 	private final String FORMAT_ERROR_TITLE = "Error";
 
-	private final int width = 250;
-	private final int height = 210;
-
 	private FormatOptions fo;
 	private Volume v;
 	private MainWindow mw;
@@ -52,28 +51,16 @@ public class FormatWindow extends JFrame {
 	private Choice fs;
 
 	public FormatWindow(MainWindow mw, Volume v) {
-		super();
+		super(TITLE, WIDTH, HEIGHT, JFrame.DISPOSE_ON_CLOSE);
 
 		this.mw = mw;
 		fo = new FormatOptions();
 		this.v = v;
-
-		setSize(width, height);
-		setLayout(null);
-		setTitle(TITLE);
-		setLocationRelativeTo(null);
-		setResizable(false);
-
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		addComponents();
-		setVisible(true);
-		
-		revalidate();
-		repaint();
+		updateFields();
 	}
 
-	private void addComponents() {
+	@Override
+	protected void addComponents() {
 		addLabelLabel();
 		addLabelTextField();
 		addFSLabel();
@@ -91,8 +78,6 @@ public class FormatWindow extends JFrame {
 
 	private void addLabelTextField() {
 		label = new JTextField(20);
-		if (v.getLabel().trim().length() > 0)
-			label.setText(v.getLabel().trim());
 		label.setBounds(5 + 75, 10, 100, 20);
 		label.addKeyListener(new KeyListener() {
 
@@ -121,11 +106,11 @@ public class FormatWindow extends JFrame {
 	private void addFSComboBox() {
 		fs = new Choice();
 		fs.setBounds(5 + 75, 10 + 20 + 5, 100, 20);
-		
-		for(String s : FormatOptions.fs){
+
+		for (String s : FormatOptions.fs) {
 			fs.add(s);
 		}
-		
+
 		getContentPane().add(fs);
 		fs.setVisible(true);
 	}
@@ -137,11 +122,11 @@ public class FormatWindow extends JFrame {
 	private void addUnitComboBox() {
 		unit = new Choice();
 		unit.setBounds(5 + 75, 10 + 40 + 10, 100, 20);
-		
-		for(String s : FormatOptions.unitsize){
+
+		for (String s : FormatOptions.unitsize) {
 			unit.add(s);
 		}
-		
+
 		getContentPane().add(unit);
 		unit.setVisible(true);
 	}
@@ -170,9 +155,9 @@ public class FormatWindow extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				fo.setLabel(label.getText());
-				
+
 				fo.setUnitSize(unit.getSelectedIndex());
-				
+
 				fo.setFs(fs.getSelectedIndex());
 
 				int resp = JOptionPane.showConfirmDialog(FormatWindow.this,
@@ -189,11 +174,13 @@ public class FormatWindow extends JFrame {
 						@Override
 						public void run() {
 							if (new DiskPartProcess().format(v, fo)) {
-								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_SUCCESS_DIALOG, FORMAT_SUCCESS_TITLE, JOptionPane.INFORMATION_MESSAGE);
+								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_SUCCESS_DIALOG,
+										FORMAT_SUCCESS_TITLE, JOptionPane.INFORMATION_MESSAGE);
 								mw.refresh();
 								dispose();
 							} else {
-								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_ERROR_DIALOG, FORMAT_ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
+								JOptionPane.showMessageDialog(FormatWindow.this, FORMAT_ERROR_DIALOG,
+										FORMAT_ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 								apply.setEnabled(true);
 								cancel.setEnabled(true);
 								FormatWindow.this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -223,12 +210,9 @@ public class FormatWindow extends JFrame {
 		getContentPane().add(cancel);
 	}
 
-	private JLabel addLabel(String label, int x, int y, int w, int h) {
-		JLabel l = new JLabel(label);
-		l.setBounds(x, y, w, h);
-		l.setVisible(true);
-		getContentPane().add(l);
-		return l;
+	@Override
+	protected void updateFields(){
+		if (v.getLabel().trim().length() > 0)
+			label.setText(v.getLabel().trim());
 	}
-
 }

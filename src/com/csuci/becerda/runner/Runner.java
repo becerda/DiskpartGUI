@@ -6,6 +6,7 @@ import javax.swing.UnsupportedLookAndFeelException;
 
 import com.csuci.becerda.process.UpdateProcess;
 import com.csuci.becerda.properties.Config;
+import com.csuci.becerda.window.AboutWindow;
 import com.csuci.becerda.window.MainWindow;
 
 public class Runner {
@@ -14,16 +15,6 @@ public class Runner {
 
 	public static void main(String[] args) {
 		Config.loadConfig();
-		
-		if (Config.getCheckForUpdate()) {
-			UpdateProcess update = new UpdateProcess();
-			if (update.check()) {
-				JOptionPane.showMessageDialog(null,
-						"There Is An Update Available!\nTo Update Close The Program And Run The Update File!",
-						"Update Available", JOptionPane.INFORMATION_MESSAGE);
-
-			}
-		}
 
 		try {
 			UIManager.setLookAndFeel(LOOK_AND_FEEL);
@@ -36,6 +27,26 @@ public class Runner {
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		} finally {
+
+			if (Config.getCheckForUpdate()) {
+				UpdateProcess up = new UpdateProcess();
+				if (up.check()) {
+					int ans = JOptionPane.showConfirmDialog(null, AboutWindow.UPDATE_AVAILABLE,
+							AboutWindow.UPDATE_AVAILABLE_TITLE, JOptionPane.YES_NO_OPTION);
+					if (ans == JOptionPane.YES_OPTION) {
+						if (up.update()) {
+							JOptionPane.showMessageDialog(null,
+									AboutWindow.SUCCESS_UPDATE_BODY_1 + up.getNewVersion()
+											+ AboutWindow.SUCCESS_UPDATE_BODY_2,
+									AboutWindow.SUCCESS_UPDATE, JOptionPane.INFORMATION_MESSAGE);
+						} else {
+							JOptionPane.showMessageDialog(null, AboutWindow.FAILED_UPDATE_BODY,
+									AboutWindow.FAILED_UPDATE, JOptionPane.ERROR_MESSAGE);
+						}
+					}
+				}
+			}
+
 			new MainWindow();
 		}
 	}

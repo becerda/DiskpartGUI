@@ -34,12 +34,12 @@ import com.csuci.becerda.window.element.RenameButton;
 import com.csuci.becerda.window.element.UMountButton;
 
 @SuppressWarnings("serial")
-public class MainWindow extends JFrame {
+public class MainWindow extends BaseWindow {
 
 	// Main Window Vars
-	private final int MAIN_WINDOW_HEIGHT = 225;
-	private final int MAIN_WINDOW_WIDTH = 445;
-	private final String MAIN_WINDOW_TITLE = "Diskpart GUI";
+	private static final String TITLE = "Diskpart GUI";
+	private static final int HEIGHT = 225;
+	private static final int WIDTH = 445;
 
 	private final int MAIN_WINDOW_LARGE_PADDING = 15;
 	private final int MAIN_WINDOW_SMALL_PADDING = 5;
@@ -86,7 +86,7 @@ public class MainWindow extends JFrame {
 
 	private final String MAIN_WINDOW_MENU_HELP = "Help";
 	private final String MAIN_WINDOW_MENU_HELP_ABOUT = "About";
-	private final String MAIN_WINDOW_MENU_HELP_UPDATE = "Check For Update";
+	private final String MAIN_WINDOW_MENU_HELP_UPDATE = "Auto Check For Update";
 
 	// Volume Label Vars
 	private final String MAIN_WINDOW_VOL_LABEL = "Volume: ";
@@ -98,13 +98,12 @@ public class MainWindow extends JFrame {
 	// Volume Table Vars
 	private final int MAIN_WINDOW_CB_X = MAIN_WINDOW_VOL_LAB_X;
 	private final int MAIN_WINDOW_CB_Y = MAIN_WINDOW_VOL_LAB_Y + MAIN_WINDOW_VOL_LAB_H + MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_CB_W = MAIN_WINDOW_WIDTH - MAIN_WINDOW_LARGE_PADDING - MAIN_WINDOW_DEFAULT_X;
+	private final int MAIN_WINDOW_CB_W = WIDTH - MAIN_WINDOW_LARGE_PADDING - MAIN_WINDOW_DEFAULT_X;
 	private final int MAIN_WINDOW_CB_H = 21 * 5;
-	private final String[] VOL_TABLE_COL_NAMES = { "Number", "Letter", "Name", "Size", "Read-Only" };
+	private static final String[] VOL_TABLE_COL_NAMES = { "Number", "Letter", "Name", "Size", "Read-Only" };
 
 	// Refresh Button Vars
-	private final int MAIN_WINDOW_REFRESH_BUTTON_X = MAIN_WINDOW_WIDTH - MAIN_WINDOW_DEFAULT_BUTTON_W
-			- MAIN_WINDOW_LARGE_PADDING;
+	private final int MAIN_WINDOW_REFRESH_BUTTON_X = WIDTH - MAIN_WINDOW_DEFAULT_BUTTON_W - MAIN_WINDOW_LARGE_PADDING;
 	private final int MAIN_WINDOW_REFRESH_BUTTON_Y = MAIN_WINDOW_VOL_LAB_Y;
 
 	// Eject/Mount Button Vars
@@ -145,25 +144,12 @@ public class MainWindow extends JFrame {
 	private ArrayList<Volume> shownVols;
 
 	public MainWindow() {
-		super();
-
-		setSize(MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGHT);
-		setLayout(null);
-		setVisible(true);
-		setTitle(MAIN_WINDOW_TITLE);
-		setLocationRelativeTo(null);
-		setResizable(false);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-		addComponents();
-
-		revalidate();
-		repaint();
-
+		super(TITLE, WIDTH, HEIGHT, JFrame.EXIT_ON_CLOSE);
 		refresh();
 	}
 
-	private void addComponents() {
+	@Override
+	protected void addComponents() {
 		addMenuBar();
 		addVolumeLabel();
 		addVolumeTable();
@@ -247,12 +233,12 @@ public class MainWindow extends JFrame {
 				new AboutWindow();
 			}
 		});
-		
+
 		JCheckBoxMenuItem update = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_HELP_UPDATE);
 		update.setMnemonic(KeyEvent.VK_U);
 		update.setSelected(Config.getCheckForUpdate());
 		update.addItemListener(new ItemListener() {
-			
+
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -263,7 +249,6 @@ public class MainWindow extends JFrame {
 				Config.saveConfig();
 			}
 		});
-		
 
 		file.add(exit);
 		view.add(showVolumes);
@@ -319,10 +304,10 @@ public class MainWindow extends JFrame {
 	private void updateUMount() {
 		if (selVol != null) {
 			if (selVol.isMounted()) {
-				updateStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
+				updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
 				umount.setText(UMountButton.EJECT);
 			} else {
-				updateStatus(MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED);
+				updateMainWindowStatus(MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED);
 				umount.setText(UMountButton.MOUNT);
 			}
 		}
@@ -390,14 +375,14 @@ public class MainWindow extends JFrame {
 						volT.setValueAt(MAIN_WINOW_TABLE_UNMOUNTED, i, 1);
 					}
 				}
-				updateStatus(MAIN_WINDOW_STATUS_FOUND_1 + size + (size > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
+				updateMainWindowStatus(MAIN_WINDOW_STATUS_FOUND_1 + size + (size > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
 						: (size == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
 			}
 		});
 	}
 
 	public void refresh() {
-		updateStatus(MAIN_WINDOW_STATUS_REFRESHING);
+		updateMainWindowStatus(MAIN_WINDOW_STATUS_REFRESHING);
 		getVolumes();
 	}
 
@@ -405,7 +390,7 @@ public class MainWindow extends JFrame {
 		Thread dp = new Thread() {
 			@Override
 			public void run() {
-				updateStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
+				updateMainWindowStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
 				vols = new DiskPartProcess().getVolumes();
 				if (vols != null) {
 					if (Config.getShowAllVolumes()) {
@@ -424,7 +409,7 @@ public class MainWindow extends JFrame {
 					getAttributes();
 					cattr.setEnabled(true);
 				} else
-					updateStatus(MAIN_WINDOW_STATUS_FAILED_FIND_VOLS);
+					updateMainWindowStatus(MAIN_WINDOW_STATUS_FAILED_FIND_VOLS);
 			}
 		};
 		dp.start();
@@ -451,7 +436,7 @@ public class MainWindow extends JFrame {
 						pos++;
 					}
 				} else {
-					updateStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
+					updateMainWindowStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
 				}
 			}
 
@@ -464,39 +449,25 @@ public class MainWindow extends JFrame {
 
 	public boolean isValidVolume() {
 		if (selVol == null) {
-			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
 			return false;
 		}
 		if (!selVol.isMounted())
 			return false;
 		if (selVol.getNumber() == -1) {
-			updateStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
 			return false;
 		}
 		if (!selVol.getType().equals(Volume.TYPE_REMOVABLE)) {
-			updateStatus(
+			updateMainWindowStatus(
 					MAIN_WINDOW_STATUS_FOUND_2 + selVol.getLetterColon() + MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE);
 			return false;
 		}
 		return true;
 	}
 
-	private JLabel addLabel(String label, int x, int y, int w, int h) {
-		JLabel l = new JLabel(label);
-		l.setBounds(x, y, w, h);
-		l.setVisible(true);
-		getContentPane().add(l);
-		return l;
-	}
-
-	public void updateStatus(String status) {
-		SwingUtilities.invokeLater(new Runnable() {
-
-			@Override
-			public void run() {
-				setTitle(MAIN_WINDOW_TITLE + MAIN_WINDOW_STATUS_SEP + status);
-			}
-		});
+	public void updateMainWindowStatus(String status) {
+		updateStatus(TITLE + MAIN_WINDOW_STATUS_SEP + status);
 	}
 
 }

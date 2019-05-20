@@ -15,8 +15,11 @@ import com.csuci.becerda.process.LabelProcess;
 import com.csuci.becerda.volume.Volume;
 
 @SuppressWarnings("serial")
-public class RenameWindow extends JFrame {
-	
+public class RenameWindow extends BaseWindow {
+
+	private static final int WIDTH = 180;
+	private static final int HEIGHT = 130;
+
 	private final String LABEL_NEW_LABEL = "New Label For Volume ";
 	private final String BUTTON_APPLY = "Apply";
 	private final String BUTTON_CANCEL = "CANCEL";
@@ -27,37 +30,25 @@ public class RenameWindow extends JFrame {
 	private final String SUCCESS_TITLE = "Success";
 	private final String ERROR_DIALOG = "Error with rename!";
 	private final String ERROR_TITLE = "Error";
-	
-	private final int width = 180;
-	private final int height = 130;
 
 	private MainWindow mw;
+	private JLabel label;
 	private JTextField tf;
 	private JButton apply;
 	private JButton cancel;
 	private Volume v;
 
 	public RenameWindow(MainWindow mw) {
-		super();
+		super(" ", WIDTH, HEIGHT, JFrame.DISPOSE_ON_CLOSE);
 
 		this.mw = mw;
 		v = mw.getSelectedVolume();
-		setSize(width, height);
-		setLayout(null);
-		setResizable(false);
-		setLocationRelativeTo(null);
-		setTitle(" ");
-		setVisible(true);
 
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
-		addComponents();
-
-		revalidate();
-		repaint();
+		updateFields();
 	}
 
-	private void addComponents() {
+	@Override
+	protected void addComponents() {
 		addLabel();
 		addTextField();
 		addApplyButton();
@@ -65,7 +56,7 @@ public class RenameWindow extends JFrame {
 	}
 
 	private void addLabel() {
-		addLabel(LABEL_NEW_LABEL + mw.getSelectedVolume().getLetterColon(), 10, 10, 150, 20);
+		label = addLabel("", 10, 10, 150, 20);
 	}
 
 	private void addTextField() {
@@ -90,7 +81,7 @@ public class RenameWindow extends JFrame {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_ENTER){
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 					runRename();
 				}
 			}
@@ -126,8 +117,8 @@ public class RenameWindow extends JFrame {
 		});
 		getContentPane().add(cancel);
 	}
-	
-	private void runRename(){
+
+	private void runRename() {
 		int resp = JOptionPane.showConfirmDialog(RenameWindow.this,
 				CONFIRM_DIALOG_1 + v.getLetterColon() + CONFIRM_DIALOG_2 + tf.getText().toUpperCase(), CONFIRM_TITLE,
 				JOptionPane.YES_NO_OPTION);
@@ -143,20 +134,16 @@ public class RenameWindow extends JFrame {
 				mw.refresh();
 				dispose();
 			} else {
-				JOptionPane.showMessageDialog(RenameWindow.this, ERROR_DIALOG, ERROR_TITLE,
-						JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(RenameWindow.this, ERROR_DIALOG, ERROR_TITLE, JOptionPane.ERROR_MESSAGE);
 				apply.setEnabled(true);
 				cancel.setEnabled(true);
 			}
 		}
 	}
 
-	private JLabel addLabel(String label, int x, int y, int w, int h) {
-		JLabel l = new JLabel(label);
-		l.setBounds(x, y, w, h);
-		l.setVisible(true);
-		getContentPane().add(l);
-		return l;
+	@Override
+	protected void updateFields() {
+		label.setText(LABEL_NEW_LABEL + mw.getSelectedVolume().getLetterColon());
 	}
 
 }
