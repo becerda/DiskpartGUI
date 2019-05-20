@@ -42,7 +42,7 @@ public class DiskPartProcess extends ProcessRunner {
 	private final String PA_REGEX = "Read-only  : (?<set>Yes|No)";
 
 	// Volume Strings
-	private final String PV_REGEX = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z ])( ){3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT| )( ){2,6}(?<voltype>Partition|Removable)( ){4,5}(?<volsize>[1-9]{1,3})( )(?<volgk>K|G)B( ){2}(?<volstat>Healthy)( ){0,4}(?<volinfo>[a-zA-Z]+)?";
+	private final String PV_REGEX = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z ])( ){0,3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT| )?( ){2,7}(?<voltype>Partition|Removable)?( ){3,14}(?<volsize>[1-9]{1,4})?( )(?<volgk>K|G|M| )B( ){2}(?<volstat>Healthy)?( ){0,11}(?<volinfo>[a-zA-Z]+)?";
 	private final String PV_REGEX_GROUP_VOL_NUM = "volnum";
 	private final String PV_REGEX_GROUP_VOL_LET = "vollet";
 	private final String PV_REGEX_GROUP_VOL_LAB = "vollab";
@@ -52,13 +52,13 @@ public class DiskPartProcess extends ProcessRunner {
 	private final String PV_REGEX_GROUP_VOL_GK = "volgk";
 	private final String PV_REGEX_GROUP_VOL_STAT = "volstat";
 	private final String PV_REGEX_GROUP_VOL_INFO = "volinfo";
-	
+
 	// Unmount Strings
 	private final String U_REMOVE = "REMOVE ALL DISMOUNT";
 	private final String U_ASSIGN = "ASSIGN";
 	private final String PU_REGEX_U = "DiskPart successfully dismounted and offlined the volume.";
 	private final String PU_REGEX_A = "DiskPart successfully assigned the drive letter or mount point.";
-	
+
 	private ArrayList<String> scriptCommands;
 	private File script;
 	private String scriptName;
