@@ -1,5 +1,7 @@
 package com.csuci.becerda.runner;
 
+import java.awt.EventQueue;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -14,8 +16,6 @@ public class Runner {
 	private static final String LOOK_AND_FEEL = "com.sun.java.swing.plaf.windows.WindowsLookAndFeel";
 
 	public static void main(String[] args) {
-		Config.loadConfig();
-
 		try {
 			UIManager.setLookAndFeel(LOOK_AND_FEEL);
 		} catch (ClassNotFoundException e) {
@@ -27,6 +27,7 @@ public class Runner {
 		} catch (UnsupportedLookAndFeelException e) {
 			e.printStackTrace();
 		} finally {
+			Config.loadConfig();
 
 			if (Config.getCheckForUpdate()) {
 				UpdateProcess up = new UpdateProcess();
@@ -47,7 +48,13 @@ public class Runner {
 				}
 			}
 
-			new MainWindow();
+			EventQueue.invokeLater(new Runnable() {
+
+				@Override
+				public void run() {
+					new MainWindow();
+				}
+			});
 		}
 	}
 

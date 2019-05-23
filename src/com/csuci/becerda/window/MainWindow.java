@@ -10,17 +10,12 @@ import java.util.ArrayList;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.DefaultTableCellRenderer;
 
 import com.csuci.becerda.process.DiskPartProcess;
 import com.csuci.becerda.properties.Config;
@@ -32,6 +27,7 @@ import com.csuci.becerda.window.element.ROAttribButton;
 import com.csuci.becerda.window.element.RefreshButton;
 import com.csuci.becerda.window.element.RenameButton;
 import com.csuci.becerda.window.element.UMountButton;
+import com.csuci.becerda.window.element.VolumeTable;
 
 @SuppressWarnings("serial")
 public class MainWindow extends BaseWindow {
@@ -39,101 +35,84 @@ public class MainWindow extends BaseWindow {
 	// Main Window Vars
 	private static final String TITLE = "Diskpart GUI";
 	private static final int HEIGHT = 225;
-	private static final int WIDTH = 445;
+	private static final int WIDTH = 449;
 
-	private final int MAIN_WINDOW_LARGE_PADDING = 15;
-	private final int MAIN_WINDOW_SMALL_PADDING = 5;
-	private final int MAIN_WINDOW_DEFAULT_BUTTON_W = BaseButton.DEFAULT_WIDTH;
+	private final int LARGE_PADDING = 15;
+	private final int SMALL_PADDING = 5;
+	private final int DEFAULT_BUTTON_W = BaseButton.DEFAULT_WIDTH;
 
-	private final int MAIN_WINDOW_DEFAULT_X = 10;
-	private final int MAIN_WINDOW_DEFAULT_Y = 10;
-	private final int MAIN_WINDOW_DEFAULT_LABEL_W = 100;
-	private final int MAIN_WINDOW_DEFAULT_LABEL_H = 20;
+	private final int DEFAULT_X = 10;
+	private final int DEFAULT_Y = 10;
+	private final int DEFAULT_LABEL_W = 100;
+	private final int DEFAULT_LABEL_H = 20;
 
 	// Main Window Status Vars
-	private final String MAIN_WINDOW_STATUS_FINDING_VOLS = "Finding Volumes...";
-	private final String MAIN_WINDOW_STATUS_REFRESHING = "Refreshing...";
-	private final String MAIN_WINDOW_STATUS_SEP = " - ";
-	private final String MAIN_WINDOW_STATUS_FAILED_FIND_VOLS = "Failed To Find Volumes";
-	private final String MAIN_WINDOW_STATUS_FOUND_1 = "Finished, Found ";
-	private final String MAIN_WINDOW_STATUS_FOUND_2 = " Volume ";
-	private final String MAIN_WINDOW_STATUS_FOUND_2S = " Volumes";
-	private final String MAIN_WINDOW_STATUS_SELECTED_VOL = "Selected Volume ";
-	private final String MAIN_WINDOW_STATUS_SELECTED_NONE = "No Volume Selected";
-	private final String MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
-	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED = "Volume Is Not Mounted";
-	private final String MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE = " Is Not Removable";
-
-	// Volume Table Vars
-	private final String MAIN_WINDOW_TABLE_BYTE = "B";
-	private final String MAIN_WINOW_TABLE_UNMOUNTED = "UNMOUNTED";
-	private final String MAIN_WINOW_TABLE_YES = "Yes";
-	private final String MAIN_WINOW_TABLE_NO = "No";
+	private final String STATUS_FINDING_VOLS = "Finding Volumes...";
+	private final String STATUS_REFRESHING = "Refreshing...";
+	private final String STATUS_FAILED_FIND_VOLS = "Failed To Find Volumes";
+	private final String STATUS_FOUND_1 = "Finished, Found ";
+	private final String STATUS_FOUND_2 = " Volume ";
+	private final String STATUS_FOUND_2S = " Volumes";
+	private final String STATUS_SELECTED_VOL = "Selected Volume ";
+	public static final String STATUS_SELECTED_NONE = "No Volume Selected";
+	private final String STATUS_FAILED_FOUND_ATTRS = "Could Not Find Attributes";
+	private final String STATUS_VOLUME_NOT_MOUNTED = "Volume Is Not Mounted";
+	private final String STATUS_VOLUME_NOT_REMOVABLE = " Is Not Removable";
 
 	// Main Window Menu Bar Vars
-	private final String MAIN_WINDOW_MENU_FILE = "File";
-	private final String MAIN_WINDOW_MENU_FILE_EXIT = "Exit";
+	private final String MENU_FILE = "File";
+	private final String MENU_FILE_EXIT = "Exit";
 
-	private final String MAIN_WINDOW_MENU_VIEW = "View";
-	private final String MAIN_WINDOW_MENU_VIEW_SAV = "Show All Volumes";
-	private final String MAIN_WINDOW_MENU_VIEW_MV = "Max Volumes";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG = "New Maximum Shown Volumes (< 100):";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE = "Maximum Shown Volumes";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS = "Please Restart For Changes To Take Affect!";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS = "Restart Required";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR = "Please Enter A Number Greater Than 0 And Less Than 100!";
-	private final String MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR = "Error";
+	private final String MENU_VIEW = "View";
+	private final String MENU_VIEW_SAV = "Show All Volumes";
 
-	private final String MAIN_WINDOW_MENU_HELP = "Help";
-	private final String MAIN_WINDOW_MENU_HELP_ABOUT = "About";
-	private final String MAIN_WINDOW_MENU_HELP_UPDATE = "Auto Check For Update";
+	private final String MENU_HELP = "Help";
+	private final String MENU_HELP_ABOUT = "About";
+	private final String MENU_HELP_UPDATE = "Auto Check For Update";
 
 	// Volume Label Vars
-	private final String MAIN_WINDOW_VOL_LABEL = "Volume: ";
-	private final int MAIN_WINDOW_VOL_LAB_X = MAIN_WINDOW_DEFAULT_X;
-	private final int MAIN_WINDOW_VOL_LAB_Y = MAIN_WINDOW_DEFAULT_Y;
-	private final int MAIN_WINDOW_VOL_LAB_W = MAIN_WINDOW_DEFAULT_LABEL_W;
-	private final int MAIN_WINDOW_VOL_LAB_H = MAIN_WINDOW_DEFAULT_LABEL_H;
+	private final String VOL_LABEL = "Volume: ";
+	private final int VOL_LAB_X = DEFAULT_X;
+	private final int VOL_LAB_Y = DEFAULT_Y;
+	private final int VOL_LAB_W = DEFAULT_LABEL_W;
+	private final int VOL_LAB_H = DEFAULT_LABEL_H;
 
 	// Volume Table Vars
-	private final int MAIN_WINDOW_CB_X = MAIN_WINDOW_VOL_LAB_X;
-	private final int MAIN_WINDOW_CB_Y = MAIN_WINDOW_VOL_LAB_Y + MAIN_WINDOW_VOL_LAB_H + MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_CB_W = WIDTH - MAIN_WINDOW_LARGE_PADDING - MAIN_WINDOW_DEFAULT_X;
-	private final int MAIN_WINDOW_CB_H = 21 * 5;
-	private static final String[] VOL_TABLE_COL_NAMES = { "Number", "Letter", "Name", "Size", "Read-Only" };
+	private final String TABLE_YES = "Yes";
+	private final String TABLE_NO = "No";
+	private final int CB_X = VOL_LAB_X;
+	private final int CB_Y = VOL_LAB_Y + VOL_LAB_H + SMALL_PADDING;
+	private final int CB_W = WIDTH - LARGE_PADDING - DEFAULT_X;
+	private final int CB_H = 21 * 5;
 
 	// Refresh Button Vars
-	private final int MAIN_WINDOW_REFRESH_BUTTON_X = WIDTH - MAIN_WINDOW_DEFAULT_BUTTON_W - MAIN_WINDOW_LARGE_PADDING;
-	private final int MAIN_WINDOW_REFRESH_BUTTON_Y = MAIN_WINDOW_VOL_LAB_Y;
+	private final int REFRESH_BUTTON_X = WIDTH - DEFAULT_BUTTON_W - LARGE_PADDING;
+	private final int REFRESH_BUTTON_Y = VOL_LAB_Y;
 
 	// Eject/Mount Button Vars
-	private final int MAIN_WINDOW_EJECT_BUTTON_X = MAIN_WINDOW_VOL_LAB_X;
-	private final int MAIN_WINDOW_EJECT_BUTTON_Y = MAIN_WINDOW_CB_Y + MAIN_WINDOW_CB_H + MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_EJECT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+	private final int EJECT_BUTTON_X = VOL_LAB_X;
+	private final int EJECT_BUTTON_Y = CB_Y + CB_H + SMALL_PADDING;
+	private final int EJECT_BUTTON_W = DEFAULT_BUTTON_W;
 
 	// Format Button Vars
-	private final int MAIN_WINDOW_FORMAT_BUTTON_X = MAIN_WINDOW_EJECT_BUTTON_X + MAIN_WINDOW_EJECT_BUTTON_W
-			+ MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_FORMAT_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
-	private final int MAIN_WINDOW_FORMAT_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+	private final int FORMAT_BUTTON_X = EJECT_BUTTON_X + EJECT_BUTTON_W + SMALL_PADDING;
+	private final int FORMAT_BUTTON_Y = EJECT_BUTTON_Y;
+	private final int FORMAT_BUTTON_W = DEFAULT_BUTTON_W;
 
 	// Rename Button Vars
-	private final int MAIN_WINDOW_RENAME_BUTTON_X = MAIN_WINDOW_FORMAT_BUTTON_X + MAIN_WINDOW_FORMAT_BUTTON_W
-			+ MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_RENAME_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
-	private final int MAIN_WINDOW_RENAME_BUTTON_W = MAIN_WINDOW_DEFAULT_BUTTON_W;
+	private final int RENAME_BUTTON_X = FORMAT_BUTTON_X + FORMAT_BUTTON_W + SMALL_PADDING;
+	private final int RENAME_BUTTON_Y = EJECT_BUTTON_Y;
+	private final int RENAME_BUTTON_W = DEFAULT_BUTTON_W;
 
 	// Bitlocker Button Vars
-	private final int MAIN_WINDOW_BL_BUTTON_X = MAIN_WINDOW_RENAME_BUTTON_X + MAIN_WINDOW_RENAME_BUTTON_W
-			+ MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_BL_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
+	private final int BL_BUTTON_X = RENAME_BUTTON_X + RENAME_BUTTON_W + SMALL_PADDING;
+	private final int BL_BUTTON_Y = EJECT_BUTTON_Y;
 
 	// ReadOnly Button Vars
-	private final int MAIN_WINDOW_READONLY_BUTTON_X = MAIN_WINDOW_BL_BUTTON_X + MAIN_WINDOW_DEFAULT_BUTTON_W
-			+ MAIN_WINDOW_SMALL_PADDING;
-	private final int MAIN_WINDOW_READONLY_BUTTON_Y = MAIN_WINDOW_EJECT_BUTTON_Y;
+	private final int READONLY_BUTTON_X = BL_BUTTON_X + DEFAULT_BUTTON_W + SMALL_PADDING;
+	private final int READONLY_BUTTON_Y = EJECT_BUTTON_Y;
 
-	private JTable volT;
+	private VolumeTable vt;
 	private JButton cattr;
 	private JButton umount;
 
@@ -164,10 +143,10 @@ public class MainWindow extends BaseWindow {
 	private void addMenuBar() {
 		JMenuBar menu = new JMenuBar();
 
-		JMenu file = new JMenu(MAIN_WINDOW_MENU_FILE);
+		JMenu file = new JMenu(MENU_FILE);
 		file.setMnemonic(KeyEvent.VK_F);
 
-		JMenuItem exit = new JMenuItem(MAIN_WINDOW_MENU_FILE_EXIT);
+		JMenuItem exit = new JMenuItem(MENU_FILE_EXIT);
 		exit.setMnemonic(KeyEvent.VK_E);
 		exit.addActionListener(new ActionListener() {
 
@@ -177,10 +156,10 @@ public class MainWindow extends BaseWindow {
 			}
 		});
 
-		JMenu view = new JMenu(MAIN_WINDOW_MENU_VIEW);
+		JMenu view = new JMenu(MENU_VIEW);
 		view.setMnemonic(KeyEvent.VK_O);
 
-		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_VIEW_SAV);
+		JCheckBoxMenuItem showVolumes = new JCheckBoxMenuItem(MENU_VIEW_SAV);
 		showVolumes.setMnemonic(KeyEvent.VK_H);
 		showVolumes.setSelected(Config.getShowAllVolumes());
 		showVolumes.addItemListener(new ItemListener() {
@@ -197,34 +176,10 @@ public class MainWindow extends BaseWindow {
 			}
 		});
 
-		JMenuItem maxVolumeShown = new JMenuItem(MAIN_WINDOW_MENU_VIEW_MV);
-		maxVolumeShown.setMnemonic(KeyEvent.VK_M);
-		maxVolumeShown.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String input = JOptionPane.showInputDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG,
-						MAIN_WINDOW_MENU_VIEW_MV_TITLE, JOptionPane.OK_CANCEL_OPTION);
-				if (input != null) {
-					try {
-						int max = Integer.parseInt(input);
-						Config.setMaxShownVolumes(max);
-						Config.saveConfig();
-						JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_SUCCESS,
-								MAIN_WINDOW_MENU_VIEW_MV_TITLE_SUCCESS, JOptionPane.INFORMATION_MESSAGE);
-					} catch (NumberFormatException nfe) {
-						nfe.printStackTrace();
-						JOptionPane.showMessageDialog(MainWindow.this, MAIN_WINDOW_MENU_VIEW_MV_DIALOG_ERROR,
-								MAIN_WINDOW_MENU_VIEW_MV_TITLE_ERROR, JOptionPane.ERROR_MESSAGE);
-					}
-				}
-			}
-		});
-
-		JMenu help = new JMenu(MAIN_WINDOW_MENU_HELP);
+		JMenu help = new JMenu(MENU_HELP);
 		help.setMnemonic(KeyEvent.VK_H);
 
-		JMenuItem about = new JMenuItem(MAIN_WINDOW_MENU_HELP_ABOUT);
+		JMenuItem about = new JMenuItem(MENU_HELP_ABOUT);
 		about.setMnemonic(KeyEvent.VK_A);
 		about.addActionListener(new ActionListener() {
 
@@ -234,7 +189,7 @@ public class MainWindow extends BaseWindow {
 			}
 		});
 
-		JCheckBoxMenuItem update = new JCheckBoxMenuItem(MAIN_WINDOW_MENU_HELP_UPDATE);
+		JCheckBoxMenuItem update = new JCheckBoxMenuItem(MENU_HELP_UPDATE);
 		update.setMnemonic(KeyEvent.VK_U);
 		update.setSelected(Config.getCheckForUpdate());
 		update.addItemListener(new ItemListener() {
@@ -251,10 +206,11 @@ public class MainWindow extends BaseWindow {
 		});
 
 		file.add(exit);
+
 		view.add(showVolumes);
-		view.addSeparator();
-		view.add(maxVolumeShown);
+
 		help.add(about);
+		help.addSeparator();
 		help.add(update);
 
 		menu.add(file);
@@ -265,49 +221,41 @@ public class MainWindow extends BaseWindow {
 	}
 
 	private void addVolumeLabel() {
-		addLabel(MAIN_WINDOW_VOL_LABEL, MAIN_WINDOW_VOL_LAB_X, MAIN_WINDOW_VOL_LAB_Y, MAIN_WINDOW_VOL_LAB_W,
-				MAIN_WINDOW_VOL_LAB_H);
+		addLabel(VOL_LABEL, VOL_LAB_X, VOL_LAB_Y, VOL_LAB_W, VOL_LAB_H);
 	}
 
 	private void addVolumeTable() {
-		volT = new JTable(new String[Config.getMaxShownVolumes()][VOL_TABLE_COL_NAMES.length], VOL_TABLE_COL_NAMES);
-		for (int i = 0; i < volT.getColumnCount(); i++) {
-			Class<?> col_class = volT.getColumnClass(i);
-			volT.setDefaultEditor(col_class, null); // remove editor
-		}
-		JScrollPane sp = new JScrollPane(volT);
-		sp.setBounds(MAIN_WINDOW_CB_X, MAIN_WINDOW_CB_Y, MAIN_WINDOW_CB_W, MAIN_WINDOW_CB_H);
-		volT.setFillsViewportHeight(true);
-		volT.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		vt = new VolumeTable(CB_X, CB_Y, CB_W, CB_H);
+		ListSelectionListener lsl = new ListSelectionListener() {
 
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (shownVols != null) {
-					int idx = volT.getSelectedRow();
-					if (idx < shownVols.size()) {
-						selVol = shownVols.get(idx);
-						updateAttr();
-						updateUMount();
+					int idx = vt.getSelectedRow();
+					if (idx >= 0) {
+						if (idx < shownVols.size()) {
+							selVol = shownVols.get(idx);
+							updateAttr();
+							updateUMount();
+						}
+					} else {
+						selVol = null;
 					}
 				}
 			}
-		});
-		volT.getTableHeader().setResizingAllowed(false);
-		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-		renderer.setHorizontalAlignment(JLabel.CENTER);
-		for (int i = 0; i < volT.getColumnCount(); i++) {
-			volT.getColumnModel().getColumn(i).setCellRenderer(renderer);
-		}
-		getContentPane().add(sp);
+		};
+		vt.addListSelectionListener(lsl);
+		getContentPane().add(vt);
+		vt.setVisible(true);
 	}
 
 	private void updateUMount() {
 		if (selVol != null) {
 			if (selVol.isMounted()) {
-				updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_VOL + selVol.getLetterColon());
+				updateMainWindowStatus(STATUS_SELECTED_VOL + selVol.getLetterColon());
 				umount.setText(UMountButton.EJECT);
 			} else {
-				updateMainWindowStatus(MAIN_WINDOW_STATUS_VOLUME_NOT_MOUNTED);
+				updateMainWindowStatus(STATUS_VOLUME_NOT_MOUNTED);
 				umount.setText(UMountButton.MOUNT);
 			}
 		}
@@ -324,65 +272,50 @@ public class MainWindow extends BaseWindow {
 	}
 
 	private void addRefreshButton() {
-		new RefreshButton(this, MAIN_WINDOW_REFRESH_BUTTON_X, MAIN_WINDOW_REFRESH_BUTTON_Y);
+		new RefreshButton(this, REFRESH_BUTTON_X, REFRESH_BUTTON_Y);
 	}
 
 	private void addEjectButton() {
-		umount = new UMountButton(this, MAIN_WINDOW_EJECT_BUTTON_X, MAIN_WINDOW_EJECT_BUTTON_Y);
+		umount = new UMountButton(this, EJECT_BUTTON_X, EJECT_BUTTON_Y);
 	}
 
 	private void addFormatButton() {
-		new FormatButton(this, MAIN_WINDOW_FORMAT_BUTTON_X, MAIN_WINDOW_FORMAT_BUTTON_Y);
+		new FormatButton(this, FORMAT_BUTTON_X, FORMAT_BUTTON_Y);
 	}
 
 	private void addRenameButton() {
-		new RenameButton(this, MAIN_WINDOW_RENAME_BUTTON_X, MAIN_WINDOW_RENAME_BUTTON_Y);
+		new RenameButton(this, RENAME_BUTTON_X, RENAME_BUTTON_Y);
 	}
 
 	private void addBitLockButton() {
-		new BitLockButton(this, MAIN_WINDOW_BL_BUTTON_X, MAIN_WINDOW_BL_BUTTON_Y);
+		new BitLockButton(this, BL_BUTTON_X, BL_BUTTON_Y);
 	}
 
 	private void addReadOnlyButton() {
-		cattr = new ROAttribButton(this, MAIN_WINDOW_READONLY_BUTTON_X, MAIN_WINDOW_READONLY_BUTTON_Y);
+		cattr = new ROAttribButton(this, READONLY_BUTTON_X, READONLY_BUTTON_Y);
 	}
 
 	public Volume getSelectedVolume() {
 		return selVol;
 	}
 
-	private void clearVolumeTable() {
-		for (int i = 0; i < volT.getRowCount() - 1; i++) {
-			for (int j = 0; j < volT.getColumnCount(); j++) {
-				volT.setValueAt("", i, j);
-			}
-		}
-	}
-
 	private void updateVolumeTableBox() {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				clearVolumeTable();
-				int size = Math.min(shownVols.size(), Config.getMaxShownVolumes());
+				vt.clear();
+				int size = Math.min(shownVols.size(), vols.size());
 				for (int i = 0; i < size; i++) {
 					Volume v = shownVols.get(i);
-					volT.setValueAt(v.getNumber() + "", i, 0);
-					if (v.isMounted()) {
-						volT.setValueAt(v.getLetterColon() + "", i, 1);
-						volT.setValueAt(v.getLabel(), i, 2);
-						volT.setValueAt(v.getSize() + " " + v.getGK() + MAIN_WINDOW_TABLE_BYTE, i, 3);
-					} else {
-						volT.setValueAt(MAIN_WINOW_TABLE_UNMOUNTED, i, 1);
-					}
+					vt.addVolume(v);
 				}
-				updateMainWindowStatus(MAIN_WINDOW_STATUS_FOUND_1 + size + (size > 1 ? MAIN_WINDOW_STATUS_FOUND_2S
-						: (size == 0 ? MAIN_WINDOW_STATUS_FOUND_2S : MAIN_WINDOW_STATUS_FOUND_2)));
+				updateMainWindowStatus(STATUS_FOUND_1 + size
+						+ (size > 1 ? STATUS_FOUND_2S : (size == 0 ? STATUS_FOUND_2S : STATUS_FOUND_2)));
 			}
 		});
 	}
 
 	public void refresh() {
-		updateMainWindowStatus(MAIN_WINDOW_STATUS_REFRESHING);
+		updateMainWindowStatus(STATUS_REFRESHING);
 		getVolumes();
 	}
 
@@ -390,7 +323,7 @@ public class MainWindow extends BaseWindow {
 		Thread dp = new Thread() {
 			@Override
 			public void run() {
-				updateMainWindowStatus(MAIN_WINDOW_STATUS_FINDING_VOLS);
+				updateMainWindowStatus(STATUS_FINDING_VOLS);
 				vols = new DiskPartProcess().getVolumes();
 				if (vols != null) {
 					if (Config.getShowAllVolumes()) {
@@ -409,7 +342,7 @@ public class MainWindow extends BaseWindow {
 					getAttributes();
 					cattr.setEnabled(true);
 				} else
-					updateMainWindowStatus(MAIN_WINDOW_STATUS_FAILED_FIND_VOLS);
+					updateMainWindowStatus(STATUS_FAILED_FIND_VOLS);
 			}
 		};
 		dp.start();
@@ -424,7 +357,7 @@ public class MainWindow extends BaseWindow {
 			public void run() {
 				if (attribs.size() > 0) {
 					int pos = 0;
-					int size = Math.min(attribs.size(), Config.getMaxShownVolumes());
+					int size = Math.min(attribs.size(), vols.size());
 					for (int i = 0; i < size; i++) {
 						Volume v = vols.get(i);
 						if (!Config.getShowAllVolumes()) {
@@ -432,11 +365,11 @@ public class MainWindow extends BaseWindow {
 								continue;
 							}
 						}
-						volT.getModel().setValueAt(attribs.get(i) ? MAIN_WINOW_TABLE_YES : MAIN_WINOW_TABLE_NO, pos, 4);
+						vt.updateCell(pos, VolumeTable.READONLY_COL, attribs.get(i) ? TABLE_YES : TABLE_NO);
 						pos++;
 					}
 				} else {
-					updateMainWindowStatus(MAIN_WINDOW_STATUS_FAILED_FOUND_ATTRS);
+					updateMainWindowStatus(STATUS_FAILED_FOUND_ATTRS);
 				}
 			}
 
@@ -449,25 +382,24 @@ public class MainWindow extends BaseWindow {
 
 	public boolean isValidVolume() {
 		if (selVol == null) {
-			updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			updateMainWindowStatus(STATUS_SELECTED_NONE);
 			return false;
 		}
 		if (!selVol.isMounted())
 			return false;
 		if (selVol.getNumber() == -1) {
-			updateMainWindowStatus(MAIN_WINDOW_STATUS_SELECTED_NONE);
+			updateMainWindowStatus(STATUS_SELECTED_NONE);
 			return false;
 		}
 		if (!selVol.getType().equals(Volume.TYPE_REMOVABLE)) {
-			updateMainWindowStatus(
-					MAIN_WINDOW_STATUS_FOUND_2 + selVol.getLetterColon() + MAIN_WINDOW_STATUS_VOLUME_NOT_REMOVABLE);
+			updateMainWindowStatus(STATUS_FOUND_2 + selVol.getLetterColon() + STATUS_VOLUME_NOT_REMOVABLE);
 			return false;
 		}
 		return true;
 	}
 
 	public void updateMainWindowStatus(String status) {
-		updateStatus(TITLE + MAIN_WINDOW_STATUS_SEP + status);
+		updateStatus(TITLE + TITLE_SEPERATOR + status);
 	}
 
 }

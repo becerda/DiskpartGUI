@@ -42,7 +42,7 @@ public class DiskPartProcess extends ProcessRunner {
 	private final String PA_REGEX = "Read-only  : (?<set>Yes|No)";
 
 	// Volume Strings
-	private final String PV_REGEX = "Volume (?<volnum>[0-9]+)( ){4,5}(?<vollet>[A-Z ])( ){0,3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT| )?( ){2,7}(?<voltype>Partition|Removable)?( ){3,14}(?<volsize>[1-9]{1,4})?( )(?<volgk>K|G|M| )B( ){2}(?<volstat>Healthy)?( ){0,11}(?<volinfo>[a-zA-Z]+)?";
+	private final String PV_REGEX = "Volume (?<volnum>[0-9]){1,2}( ){4,5}(?<vollet>[A-Z ])( ){0,3}(?<vollab>[a-zA-Z ]{0,11})( ){2,3}(?<volfs>NTFS|FAT32|exFAT|CDFS|UDF)?( ){2,7}(?<voltype>Partition|Removable|DVD-ROM|Simple)?( ){3,14}(?<volsize>[1-9]{1,4})?( )(?<volgk>K|G|M)?B( ){2}(?<volstat>Healthy|No Media)?( ){0,11}(?<volinfo>[a-zA-Z]+)?";
 	private final String PV_REGEX_GROUP_VOL_NUM = "volnum";
 	private final String PV_REGEX_GROUP_VOL_LET = "vollet";
 	private final String PV_REGEX_GROUP_VOL_LAB = "vollab";
@@ -84,7 +84,7 @@ public class DiskPartProcess extends ProcessRunner {
 
 			BufferedWriter br = new BufferedWriter(new FileWriter(script));
 			for (String s : scriptCommands) {
-				br.write(s + "\n");
+				br.write(s + NEW_LINE);
 			}
 			br.close();
 			addArg(scriptName);
@@ -106,16 +106,7 @@ public class DiskPartProcess extends ProcessRunner {
 		addToScript(ATTRIBUTE_DISK + (set ? RO_SET : RO_CLEAR) + RO_READONLY);
 		writeScript();
 		String output = run();
-		return parseReadOnly(output);
-	}
-
-	private boolean parseReadOnly(String input) {
-		Pattern p = Pattern.compile(PRO_REGEX);
-		Matcher m = p.matcher(input);
-		if (m.find()) {
-			return true;
-		}
-		return false;
+		return matchOutput(output, PRO_REGEX);
 	}
 
 	public boolean format(Volume v, FormatOptions fo) {
@@ -144,16 +135,7 @@ public class DiskPartProcess extends ProcessRunner {
 		writeScript();
 		String output = run();
 		script.delete();
-		return parseFormat(output);
-	}
-
-	private boolean parseFormat(String input) {
-		Pattern p = Pattern.compile(PF_REGEX);
-		Matcher m = p.matcher(input);
-		if (m.find()) {
-			return true;
-		}
-		return false;
+		return matchOutput(output, PF_REGEX);
 	}
 
 	public ArrayList<Boolean> getAttributes(ArrayList<Volume> vols) {
@@ -212,16 +194,7 @@ public class DiskPartProcess extends ProcessRunner {
 		writeScript();
 		String output = run();
 		script.delete();
-		return parseEject(output);
-	}
-
-	private boolean parseEject(String input) {
-		Pattern p = Pattern.compile(PU_REGEX_U);
-		Matcher m = p.matcher(input);
-		if (m.find()) {
-			return true;
-		}
-		return false;
+		return matchOutput(output, PU_REGEX_U);
 	}
 
 	public boolean assignVolume(Volume v) {
@@ -229,15 +202,6 @@ public class DiskPartProcess extends ProcessRunner {
 		addToScript(U_ASSIGN);
 		writeScript();
 		String output = run();
-		return parseAssign(output);
-	}
-
-	public boolean parseAssign(String input) {
-		Pattern p = Pattern.compile(PU_REGEX_A);
-		Matcher m = p.matcher(input);
-		if (m.find()) {
-			return true;
-		}
-		return false;
+		return matchOutput(output, PU_REGEX_A);
 	}
 }
